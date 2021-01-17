@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_title">Let\'s Plant</string>
+    <string name="sign_button">Sign In</string>
+    <string name="forgot_password_text">Forgot your password?</string>
+    <string name="edit_text_password">Enter password</string>
+    <string name="edit_text_username">Enter username</string>
+    <string name="text_view_sign">Sign Up</string>
+    <string name="or">Or</string>
+    <string name="edit_text_email">Enter email</string>
+    <string name="edit_text_confirm_password">Confirm password</string>
+    <string name="text_view_sign_in">Sign In</string>
+    <string name="text_view_back_to">Back to&#160;</string>
+</resources>
