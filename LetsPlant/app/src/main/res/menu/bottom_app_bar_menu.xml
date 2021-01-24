@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <item
-        android:id="@+id/app_bar_fav"
+        android:id="@+id/app_bar_explore"
         android:icon="@drawable/ic_pin"
-        app:showAsAction="always"
-        android:title="Explore" />
+        android:title="Explore"
+        app:showAsAction="always" />
 
     <item
-        android:id="@+id/app_bar_search"
+        android:id="@+id/app_bar_plants"
         android:icon="@drawable/ic_leaf"
-        app:showAsAction="always"
-        android:title="Plants"/>
+        android:title="Plants"
+        app:showAsAction="always" />
     <item
         android:id="@+id/itemEmpty"
-        android:title=""/>
+        android:title="" />
     <item
-        android:id="@+id/app_bar_settings2"
+        android:id="@+id/app_bar_alerts"
         android:icon="@drawable/ic_bell"
-        app:showAsAction="always"
-        android:title="Alerts"/>
+        android:title="Alerts"
+        app:showAsAction="always" />
     <item
-        android:id="@+id/app_bar_settings"
+        android:id="@+id/app_bar_profile"
         android:icon="@drawable/ic_user"
-        app:showAsAction="always"
-        android:title="Profile"/>
+        android:title="Profile"
+        app:showAsAction="always" />
 </menu>

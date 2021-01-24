@@ -6,6 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".FeedActivity">
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/feedRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints"
+        android:paddingBottom="50dp"/>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -20,6 +26,7 @@
             app:fabAlignmentMode="center">
 
             <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottom_navigation_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginStart="0dp"
@@ -27,8 +34,10 @@
                 android:background="@drawable/background_transparent"
                 app:itemIconTint="#808080"
                 app:itemTextColor="#808080"
+                android:clickable="true"
                 app:labelVisibilityMode="labeled"
-                app:menu="@menu/bottom_app_bar_menu" />
+                app:menu="@menu/bottom_app_bar_menu"
+                android:focusable="true" />
         </com.google.android.material.bottomappbar.BottomAppBar>
 
 
@@ -38,7 +47,7 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/white"
             android:src="@drawable/ic_plant"
-            app:layout_anchor="@id/bottom_app_bar" />
+            app:layout_anchor="@id/bottom_app_bar"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
