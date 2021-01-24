@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/app_bar_fav"
+        android:icon="@drawable/ic_pin"
+        app:showAsAction="always"
+        android:title="Explore" />
+
+    <item
+        android:id="@+id/app_bar_search"
+        android:icon="@drawable/ic_leaf"
+        app:showAsAction="always"
+        android:title="Plants"/>
+    <item
+        android:id="@+id/itemEmpty"
+        android:title=""/>
+    <item
+        android:id="@+id/app_bar_settings2"
+        android:icon="@drawable/ic_bell"
+        app:showAsAction="always"
+        android:title="Alerts"/>
+    <item
+        android:id="@+id/app_bar_settings"
+        android:icon="@drawable/ic_user"
+        app:showAsAction="always"
+        android:title="Profile"/>
+</menu>

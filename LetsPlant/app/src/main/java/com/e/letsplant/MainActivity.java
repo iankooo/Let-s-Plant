@@ -3,6 +3,7 @@ package com.e.letsplant;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -82,5 +83,9 @@ public class MainActivity extends AppCompatActivity {
                 passwordEditText.setTransformationMethod(PasswordTransformationMethod.getInstance());
             }
         }
+    }
+    public void onSignButtonPress(View v){
+        Intent intent = new Intent(this, FeedActivity.class);
+        startActivity(intent);
     }
 }

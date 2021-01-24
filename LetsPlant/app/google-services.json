@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "908190366610",
+    "project_id": "let-s-plant-f845c",
+    "storage_bucket": "let-s-plant-f845c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:908190366610:android:905ca85b61a57788ccdf4b",
+        "android_client_info": {
+          "package_name": "com.e.letsplant"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "908190366610-59blp65u35ols7lq6l37g5kkp22dr86d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPFeHfXj58AXvmxzQ7PU_4K0k3w5S62Yw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "908190366610-59blp65u35ols7lq6l37g5kkp22dr86d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
