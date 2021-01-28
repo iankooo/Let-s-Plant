@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.zip.Inflater;
@@ -36,7 +37,9 @@ public class FeedActivity extends AppCompatActivity {
                         return true;
                     }
                     case R.id.app_bar_plants: {
-                        return true;
+                        Intent intent = new Intent(FeedActivity.this, PlantsActivity.class);
+                        startActivity(intent);
+                        break;
                     }
                     case R.id.app_bar_alerts: {
                         return true;
@@ -90,5 +93,11 @@ public class FeedActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(postAdapter);
+    }
+
+    public void logout(View view) {
+        FirebaseAuth.getInstance().signOut();
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        finish();
     }
 }

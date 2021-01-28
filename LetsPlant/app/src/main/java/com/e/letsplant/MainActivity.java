@@ -1,10 +1,12 @@
 package com.e.letsplant;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.view.View;
@@ -12,7 +14,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
     private TextView signTextView;
@@ -23,7 +32,9 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout orLinearLayout;
     private TextView backToTextView;
     private Boolean viewSignIn = true;
-    private EditText passwordEditText;
+    private EditText username, email, password, confirmpassword;
+    private ProgressBar progressBar;
+    private FirebaseAuth fAuth;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -43,7 +54,17 @@ public class MainActivity extends AppCompatActivity {
         signButton = findViewById(R.id.signButton);
         orLinearLayout = findViewById(R.id.orLinearLayout);
         backToTextView = findViewById(R.id.backToTextView);
-        passwordEditText = findViewById(R.id.passwordEditText);
+        username = findViewById(R.id.username);
+        email = findViewById(R.id.email);
+        confirmpassword = findViewById(R.id.confirmPassword);
+        password = findViewById(R.id.password);
+        progressBar = findViewById(R.id.progressBar_cyclic);
+
+        fAuth = FirebaseAuth.getInstance();
+        if (fAuth.getCurrentUser() != null) {
+            startActivity(new Intent(getApplicationContext(), FeedActivity.class));
+            finish();
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -59,7 +80,8 @@ public class MainActivity extends AppCompatActivity {
                 signTextView.setText("Sign In");
                 this.viewSignIn = false;
             } else {
-                emailLinearLayout.setVisibility(View.GONE);
+                //emailLinearLayout.setVisibility(View.GONE);
+                emailLinearLayout.setVisibility(View.VISIBLE);
                 confirmPasswordLinearLayout.setVisibility(View.GONE);
                 forgetPasswordLinearLayout.setVisibility(View.VISIBLE);
                 signButton.setText("Sign In");
@@ -73,19 +95,65 @@ public class MainActivity extends AppCompatActivity {
 
     public void showHidePass(View view) {
         if (view.getId() == R.id.hideImageView) {
-            if (passwordEditText.getTransformationMethod().equals(PasswordTransformationMethod.getInstance())) {
+            if (password.getTransformationMethod().equals(PasswordTransformationMethod.getInstance())) {
                 ((ImageView) view).setImageResource(R.drawable.ic_eye);
                 //Show Password
-                passwordEditText.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
             } else {
                 ((ImageView) (view)).setImageResource(R.drawable.ic_hide);
                 //Hide Password
-                passwordEditText.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                password.setTransformationMethod(PasswordTransformationMethod.getInstance());
             }
         }
     }
-    public void onSignButtonPress(View v){
-        Intent intent = new Intent(this, FeedActivity.class);
-        startActivity(intent);
+
+    public void onSignButtonPress(View v) {
+        String textSignButton = signButton.getText().toString();
+
+        String email = this.email.getText().toString().trim();
+        String password = this.password.getText().toString().trim();
+
+        if (TextUtils.isEmpty(email)) {
+            this.email.setError("Email is required!");
+            return;
+        }
+        if (TextUtils.isEmpty(password)) {
+            this.password.setError("Password is required!");
+            return;
+        }
+        if (password.length() < 6) {
+            this.password.setError("Password must be >= 6  characters");
+            return;
+        }
+
+        if (textSignButton.equals("Sign In")) {
+            progressBar.setVisibility(View.VISIBLE);
+            fAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(MainActivity.this, "Logged in successfully!", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(getApplicationContext(), FeedActivity.class));
+                    } else {
+                        Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
+                    }
+                }
+            });
+        } else {
+            progressBar.setVisibility(View.VISIBLE);
+            fAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(MainActivity.this, "User created", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(getApplicationContext(), FeedActivity.class));
+                    } else {
+                        Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
+                    }
+                }
+            });
+        }
     }
 }

@@ -8,15 +8,15 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
+        android:background="@android:color/darker_gray" />
 
     <LinearLayout
         android:id="@+id/headerPostLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         android:paddingHorizontal="5dp"
-        android:paddingVertical="1dp"
-        android:layout_marginTop="5dp">
+        android:paddingVertical="1dp">
 
         <RelativeLayout
             android:id="@+id/roundedImageRelativeLayout"
@@ -53,9 +53,28 @@
             android:layout_height="wrap_content"
             android:background="@drawable/ic_menu" />
     </LinearLayout>
+
     <ImageView
+        android:id="@+id/postImageView"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:layout_below="@+id/headerPostLinearLayout"/>
+        android:layout_below="@+id/headerPostLinearLayout"
+        android:src="@drawable/flower" />
+
+    <LinearLayout
+        android:id="@+id/footerPostLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/postImageView"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:paddingHorizontal="5dp"
+        android:paddingVertical="1dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_like" />
+    </LinearLayout>
 </RelativeLayout>
 

@@ -6,12 +6,19 @@
     android:layout_height="match_parent"
     tools:context=".FeedActivity">
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="logout"
+        android:text="Logout"
+        tools:ignore="MissingConstraints" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/feedRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:ignore="MissingConstraints"
-        android:paddingBottom="50dp"/>
+        android:paddingBottom="50dp"
+        tools:ignore="MissingConstraints" />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -32,12 +39,12 @@
                 android:layout_marginStart="0dp"
                 android:layout_marginEnd="0dp"
                 android:background="@drawable/background_transparent"
+                android:clickable="true"
+                android:focusable="true"
                 app:itemIconTint="#808080"
                 app:itemTextColor="#808080"
-                android:clickable="true"
                 app:labelVisibilityMode="labeled"
-                app:menu="@menu/bottom_app_bar_menu"
-                android:focusable="true" />
+                app:menu="@menu/bottom_app_bar_menu" />
         </com.google.android.material.bottomappbar.BottomAppBar>
 
 
@@ -47,7 +54,7 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/white"
             android:src="@drawable/ic_plant"
-            app:layout_anchor="@id/bottom_app_bar"/>
+            app:layout_anchor="@id/bottom_app_bar" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
