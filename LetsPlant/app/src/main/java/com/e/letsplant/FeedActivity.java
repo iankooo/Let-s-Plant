@@ -47,7 +47,6 @@ public class FeedActivity extends AppCompatActivity {
                     case R.id.app_bar_profile: {
                         Intent intent = new Intent(FeedActivity.this, ProfileActivity.class);
                         startActivity(intent);
-                        break;
                     }
                 }
                 return true;
@@ -93,11 +92,5 @@ public class FeedActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(postAdapter);
-    }
-
-    public void logout(View view) {
-        FirebaseAuth.getInstance().signOut();
-        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-        finish();
     }
 }

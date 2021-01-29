@@ -27,63 +27,63 @@
         android:textSize="24sp"
         android:textStyle="bold" />
 
-    <LinearLayout
-        android:id="@+id/usernameLinearLayout"
+    <RelativeLayout
+        android:id="@+id/usernameRelativeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/border_layout"
-        android:weightSum="6">
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/usernameImageView"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginVertical="8dp"
-            android:layout_marginStart="4dp"
-            android:layout_weight="1"
+            android:layout_marginStart="8dp"
             android:src="@drawable/ic_user" />
 
         <EditText
             android:id="@+id/username"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginHorizontal="4dp"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginHorizontal="8dp"
+            android:layout_toEndOf="@+id/usernameImageView"
             android:background="@android:color/transparent"
             android:hint="@string/edit_text_username"
-            android:inputType="textNoSuggestions"
+            android:inputType="textPersonName"
             android:lines="1"
             android:textColor="#E5E5E5"
             android:textColorHint="#808080"
             android:textSize="16sp" />
-    </LinearLayout>
+    </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/emailLinearLayout"
+    <RelativeLayout
+        android:id="@+id/emailRelativeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/border_layout"
-        android:visibility="visible"
-        android:weightSum="6">
+        android:visibility="visible">
 
         <ImageView
+            android:id="@+id/emailImageView"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginVertical="8dp"
-            android:layout_weight="1"
+            android:layout_marginStart="8dp"
             android:src="@drawable/ic_email" />
 
         <EditText
             android:id="@+id/email"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginHorizontal="8dp"
+            android:layout_toEndOf="@+id/emailImageView"
             android:background="@android:color/transparent"
             android:hint="@string/edit_text_email"
             android:inputType="textEmailAddress"
@@ -91,32 +91,32 @@
             android:textColor="#E5E5E5"
             android:textColorHint="#808080"
             android:textSize="16sp" />
-    </LinearLayout>
+    </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/passwordLinearLayout"
+    <RelativeLayout
+        android:id="@+id/passwordRelativeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
         android:layout_marginTop="8dp"
-        android:background="@drawable/border_layout"
-        android:weightSum="6">
+        android:background="@drawable/border_layout">
 
         <ImageView
             android:id="@+id/passwordImageView"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginVertical="8dp"
             android:layout_marginStart="8dp"
-            android:layout_weight="1"
             android:src="@drawable/ic_password" />
 
         <EditText
             android:id="@+id/password"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginHorizontal="4dp"
-            android:layout_weight="4"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginHorizontal="8dp"
+            android:layout_toStartOf="@+id/hideImageView"
+            android:layout_toEndOf="@+id/passwordImageView"
             android:background="@android:color/transparent"
             android:hint="@string/edit_text_password"
             android:inputType="textPassword"
@@ -129,40 +129,41 @@
             android:id="@+id/hideImageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="4dp"
             android:layout_marginEnd="8dp"
-            android:layout_weight="1"
             android:clickable="true"
             android:focusable="true"
             android:onClick="showHidePass"
             android:src="@drawable/ic_hide" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/confirmPasswordLinearLayout"
+    <RelativeLayout
+        android:id="@+id/confirmPasswordRelativeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/border_layout"
-        android:visibility="gone"
-        android:weightSum="6">
+        android:visibility="gone">
 
         <ImageView
+            android:id="@+id/confirmPasswordImageView"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginVertical="8dp"
-            android:layout_marginStart="6dp"
-            android:layout_weight="1"
+            android:layout_marginStart="8dp"
             android:src="@drawable/ic_password" />
 
         <EditText
             android:id="@+id/confirmPassword"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginHorizontal="8dp"
+            android:layout_toEndOf="@+id/confirmPasswordImageView"
             android:background="@android:color/transparent"
             android:hint="@string/edit_text_confirm_password"
             android:inputType="textPassword"
@@ -170,7 +171,7 @@
             android:textColor="#E5E5E5"
             android:textColorHint="#808080"
             android:textSize="16sp" />
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/forgetPasswordLinearLayout"
@@ -194,10 +195,11 @@
             android:layout_weight="1"
             android:clickable="true"
             android:focusable="true"
+            android:onClick="onClickForgotPassword"
             android:text="@string/forgot_password_text"
             android:textAlignment="viewEnd"
             android:textColor="#3399FB"
-            android:textSize="8sp"
+            android:textSize="10sp"
             tools:ignore="SmallSp" />
     </LinearLayout>
 
