@@ -15,4 +15,10 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_explore_fragment">Hello explore fragment</string>
+    <string name="hello_plants_fragment">Hello plants fragment</string>
+    <string name="hello_alerts_fragment">Hello alerts fragment</string>
+    <string name="hello_profile_fragment">Hello profile fragment</string>
+    <string name="hello_feed_fragment">Hello feed fragment</string>
 </resources>

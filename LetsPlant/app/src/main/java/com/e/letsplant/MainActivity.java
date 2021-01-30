@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         fStore = FirebaseFirestore.getInstance();
 
         if (fAuth.getCurrentUser() != null) {
-            startActivity(new Intent(getApplicationContext(), FeedActivity.class));
+            startActivity(new Intent(getApplicationContext(), SecondActivity.class));
             finish();
         }
     }
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
-                        startActivity(new Intent(getApplicationContext(), FeedActivity.class));
+                        startActivity(new Intent(getApplicationContext(), SecondActivity.class));
                         finish();
                     } else {
                         Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
                             public void onSuccess(Void aVoid) {
                             }
                         });
-                        startActivity(new Intent(getApplicationContext(), FeedActivity.class));
+                        startActivity(new Intent(getApplicationContext(), SecondActivity.class));
                         finish();
                     } else {
                         Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();

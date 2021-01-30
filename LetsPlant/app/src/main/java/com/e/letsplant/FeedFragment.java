@@ -1,57 +1,77 @@
 package com.e.letsplant;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Toast;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
-import java.util.zip.Inflater;
 
-public class FeedActivity extends AppCompatActivity {
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link FeedFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class FeedFragment extends Fragment {
+
     private ArrayList<PostModel> postsDataSource;
     private LinearLayoutManager linearLayoutManager;
     private RecyclerView recyclerView;
     private PostAdapter postAdapter;
+
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
+
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+
+    public FeedFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment FeedFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static FeedFragment newInstance(String param1, String param2) {
+        FeedFragment fragment = new FeedFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_feed);
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation_view);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.app_bar_explore: {
-                        return true;
-                    }
-                    case R.id.app_bar_plants: {
-                        Intent intent = new Intent(FeedActivity.this, PlantsActivity.class);
-                        startActivity(intent);
-                        break;
-                    }
-                    case R.id.app_bar_alerts: {
-                        return true;
-                    }
-                    case R.id.app_bar_profile: {
-                        Intent intent = new Intent(FeedActivity.this, ProfileActivity.class);
-                        startActivity(intent);
-                    }
-                }
-                return true;
-            }
-        });
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        // Inflate the layout for this fragment
+        View rootView =  inflater.inflate(R.layout.fragment_feed, container, false);
+
         postsDataSource = new ArrayList<>();
         postsDataSource.add(new PostModel("Name1"));
         postsDataSource.add(new PostModel("Name2"));
@@ -85,12 +105,13 @@ public class FeedActivity extends AppCompatActivity {
         postsDataSource.add(new PostModel("Name30"));
         postsDataSource.add(new PostModel("Name31"));
         postsDataSource.add(new PostModel("Name32"));
-
-        linearLayoutManager = new LinearLayoutManager(this);
-        recyclerView = findViewById(R.id.feedRecyclerView);
-        postAdapter = new PostAdapter(this, postsDataSource);
+        linearLayoutManager = new LinearLayoutManager(getActivity());
+        recyclerView = rootView.findViewById(R.id.feedRecyclerView);
+        postAdapter = new PostAdapter(getActivity(), postsDataSource);
 
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(postAdapter);
+
+        return rootView;
     }
 }

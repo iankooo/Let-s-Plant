@@ -9,6 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.e.letsplant.data.Post;
+
 import java.util.ArrayList;
 
 public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
