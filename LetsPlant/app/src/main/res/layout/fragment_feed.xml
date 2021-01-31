@@ -3,13 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FeedFragment">
+    tools:context=".FeedFragment"
+    android:background="#000000">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/feedRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#000000"
         android:overScrollMode="never"/>
 
 </FrameLayout>

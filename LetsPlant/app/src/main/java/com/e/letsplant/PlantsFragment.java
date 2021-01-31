@@ -1,23 +1,28 @@
 package com.e.letsplant;
 
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.e.letsplant.data.Plant;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -28,6 +33,8 @@ import com.google.firebase.storage.UploadTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static android.app.Activity.RESULT_OK;
@@ -39,10 +46,14 @@ import static android.app.Activity.RESULT_OK;
  */
 public class PlantsFragment extends Fragment {
 
-    private Button btnSelect, btnUpload;
-    private ImageView imageView;
     private Uri filePath;
     private final int PICK_IMAGE_REQUEST = 22;
+    private List<Plant> plantList;
+    private RecyclerView recyclerView;
+    private PlantAdapter plantAdapter;
+    private ImageView uploadImageView;
+    CardView cardView;
+    ImageView imageView;
 
     FirebaseStorage storage;
     StorageReference storageReference;
@@ -81,6 +92,7 @@ public class PlantsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -93,21 +105,30 @@ public class PlantsFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_plants, container, false);
 
-        btnSelect = rootView.findViewById(R.id.btnChoose);
-        btnUpload = rootView.findViewById(R.id.btnUpload);
-        imageView = rootView.findViewById(R.id.imgView);
+        cardView = rootView.findViewById(R.id.cardView);
+        imageView = rootView.findViewById(R.id.imageView);
+        uploadImageView = rootView.findViewById(R.id.uploadImageView);
+
+        plantList = new ArrayList<>();
+        preparePlant();
+        recyclerView = rootView.findViewById(R.id.plantRecyclerView);
+        plantAdapter = new PlantAdapter(plantList);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
+
+//        plantAdapter.setOnItemClickListener(new ClickListener<Plant>() {
+//            @Override
+//            public void onItemClick(Plant data) {
+//                Toast.makeText(MainActivity.this, data.getTitle(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+        recyclerView.setAdapter(plantAdapter);
+
 
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
-        btnSelect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SelectImage();
-            }
-        });
-
-        btnUpload.setOnClickListener(new View.OnClickListener() {
+        uploadImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 uploadImage();
@@ -115,6 +136,27 @@ public class PlantsFragment extends Fragment {
         });
         return rootView;
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.top_plants_bar_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_camera) {
+            Toast.makeText(getActivity(), "camera", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        if (id == R.id.action_photo_library) {
+            SelectImage();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private void SelectImage() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -130,8 +172,8 @@ public class PlantsFragment extends Fragment {
             filePath = data.getData();
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
+                cardView.setVisibility(View.VISIBLE);
                 imageView.setImageBitmap(bitmap);
-                btnUpload.setVisibility(View.VISIBLE);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -148,8 +190,7 @@ public class PlantsFragment extends Fragment {
 
             ref.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
-                public void onSuccess(
-                        UploadTask.TaskSnapshot taskSnapshot) {
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     progressDialog.dismiss();
                     Toast.makeText(getActivity(), "Image Uploaded!!", Toast.LENGTH_SHORT).show();
                 }
@@ -167,5 +208,22 @@ public class PlantsFragment extends Fragment {
                 }
             });
         }
+    }
+
+    private void preparePlant() {
+        Plant plant = new Plant("Cactus", R.drawable.cactus);
+        plantList.add(plant);
+        plant = new Plant("Zambila", R.drawable.zambila);
+        plantList.add(plant);
+        plant = new Plant("Busuioc", R.drawable.busuioc);
+        plantList.add(plant);
+        plant = new Plant("Floarea-soarelui", R.drawable.floarea_soarelui);
+        plantList.add(plant);
+        plant = new Plant("Lavanda", R.drawable.lavanda);
+        plantList.add(plant);
+        plant = new Plant("Rozmarin", R.drawable.rozmarin);
+        plantList.add(plant);
+        plant = new Plant("Orhidee", R.drawable.orhidee);
+        plantList.add(plant);
     }
 }
