@@ -34,7 +34,7 @@
                     tools:background="@tools:sample/avatars" />
 
                 <EditText
-                    android:id="@+id/title"
+                    android:id="@+id/plantNameEditText"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="8dp"

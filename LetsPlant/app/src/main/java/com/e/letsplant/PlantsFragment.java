@@ -1,6 +1,7 @@
 package com.e.letsplant;
 
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -13,18 +14,27 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.e.letsplant.data.Plant;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -35,9 +45,11 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.ContentValues.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -48,15 +60,19 @@ public class PlantsFragment extends Fragment {
 
     private Uri filePath;
     private final int PICK_IMAGE_REQUEST = 22;
-    private List<Plant> plantList;
+    private List<Plant> plantList = new ArrayList<>();
     private RecyclerView recyclerView;
     private PlantAdapter plantAdapter;
     private ImageView uploadImageView;
+    private EditText plantNameEditText;
     CardView cardView;
     ImageView imageView;
+    String Storage_Path = "All_Image_Uploads/";
+    String Database_Path = "All_Image_Uploads_Database";
 
     FirebaseStorage storage;
     StorageReference storageReference;
+    DatabaseReference databaseReference;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -108,13 +124,13 @@ public class PlantsFragment extends Fragment {
         cardView = rootView.findViewById(R.id.cardView);
         imageView = rootView.findViewById(R.id.imageView);
         uploadImageView = rootView.findViewById(R.id.uploadImageView);
+        plantNameEditText = rootView.findViewById(R.id.plantNameEditText);
 
-        plantList = new ArrayList<>();
-        preparePlant();
         recyclerView = rootView.findViewById(R.id.plantRecyclerView);
-        plantAdapter = new PlantAdapter(plantList);
+        recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
+
 
 //        plantAdapter.setOnItemClickListener(new ClickListener<Plant>() {
 //            @Override
@@ -122,11 +138,39 @@ public class PlantsFragment extends Fragment {
 //                Toast.makeText(MainActivity.this, data.getTitle(), Toast.LENGTH_SHORT).show();
 //            }
 //        });
-        recyclerView.setAdapter(plantAdapter);
-
 
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
+        databaseReference = FirebaseDatabase.getInstance().getReference(Database_Path);
+
+
+        ProgressDialog progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage("Loading plants");
+        progressDialog.show();
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot postSnapshot : snapshot.getChildren()) {
+
+                    Plant plantUploadInfo = postSnapshot.getValue(Plant.class);
+
+                    plantList.add(plantUploadInfo);
+                }
+
+                plantAdapter = new PlantAdapter(getContext(), plantList);
+
+                recyclerView.setAdapter(plantAdapter);
+
+                progressDialog.dismiss();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, databaseError.getMessage());
+                progressDialog.dismiss();
+            }
+        });
 
         uploadImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,6 +178,7 @@ public class PlantsFragment extends Fragment {
                 uploadImage();
             }
         });
+
         return rootView;
     }
 
@@ -172,6 +217,7 @@ public class PlantsFragment extends Fragment {
             filePath = data.getData();
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
+                plantNameEditText.setText("");
                 cardView.setVisibility(View.VISIBLE);
                 imageView.setImageBitmap(bitmap);
             } catch (IOException e) {
@@ -180,19 +226,51 @@ public class PlantsFragment extends Fragment {
         }
     }
 
+    public String GetFileExtension(Uri uri) {
+
+        ContentResolver contentResolver = getActivity().getContentResolver();
+
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+
+        // Returning the file Extension.
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+
+    }
+
     private void uploadImage() {
         if (filePath != null) {
             ProgressDialog progressDialog = new ProgressDialog(getActivity());
             progressDialog.setTitle("Uploading...");
             progressDialog.show();
 
-            StorageReference ref = storageReference.child("images/" + UUID.randomUUID().toString());
+            StorageReference ref = storageReference.child(Storage_Path + System.currentTimeMillis() + "." + GetFileExtension(filePath));
 
             ref.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    progressDialog.dismiss();
-                    Toast.makeText(getActivity(), "Image Uploaded!!", Toast.LENGTH_SHORT).show();
+                    if (taskSnapshot.getMetadata() != null) {
+                        if (taskSnapshot.getMetadata().getReference() != null) {
+                            Task<Uri> result = taskSnapshot.getStorage().getDownloadUrl();
+                            result.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    String imageUrl = uri.toString();
+
+                                    cardView.setVisibility(View.GONE);
+                                    String tempImageName = plantNameEditText.getText().toString().trim();
+
+                                    progressDialog.dismiss();
+
+                                    Toast.makeText(getActivity(), "Image Uploaded!!", Toast.LENGTH_SHORT).show();
+
+                                    Plant plantUploadInfo = new Plant(tempImageName, imageUrl);
+                                    String imageUploadId = databaseReference.push().getKey();
+                                    databaseReference.child(Objects.requireNonNull(imageUploadId)).setValue(plantUploadInfo);
+
+                                }
+                            });
+                        }
+                    }
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -208,22 +286,5 @@ public class PlantsFragment extends Fragment {
                 }
             });
         }
-    }
-
-    private void preparePlant() {
-        Plant plant = new Plant("Cactus", R.drawable.cactus);
-        plantList.add(plant);
-        plant = new Plant("Zambila", R.drawable.zambila);
-        plantList.add(plant);
-        plant = new Plant("Busuioc", R.drawable.busuioc);
-        plantList.add(plant);
-        plant = new Plant("Floarea-soarelui", R.drawable.floarea_soarelui);
-        plantList.add(plant);
-        plant = new Plant("Lavanda", R.drawable.lavanda);
-        plantList.add(plant);
-        plant = new Plant("Rozmarin", R.drawable.rozmarin);
-        plantList.add(plant);
-        plant = new Plant("Orhidee", R.drawable.orhidee);
-        plantList.add(plant);
     }
 }
