@@ -1,4 +1,4 @@
-package com.e.letsplant;
+package com.e.letsplant.fragments;
 
 import android.os.Bundle;
 
@@ -7,13 +7,23 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.e.letsplant.R;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link AlertsFragment#newInstance} factory method to
+ * Use the {@link PlantDetailedFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AlertsFragment extends Fragment {
+public class PlantDetailedFragment extends Fragment {
+
+    String title = "";
+    String image = "";
+    TextView plantDetailedTextView;
+    ImageView plantDetailedImageView;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -24,7 +34,7 @@ public class AlertsFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public AlertsFragment() {
+    public PlantDetailedFragment() {
         // Required empty public constructor
     }
 
@@ -34,11 +44,11 @@ public class AlertsFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment AlertsFragment.
+     * @return A new instance of fragment PlantDetailedFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static AlertsFragment newInstance(String param1, String param2) {
-        AlertsFragment fragment = new AlertsFragment();
+    public static PlantDetailedFragment newInstance(String param1, String param2) {
+        PlantDetailedFragment fragment = new PlantDetailedFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -52,6 +62,8 @@ public class AlertsFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+            title = getArguments().getString("title", "");
+            image = getArguments().getString("image", "");
         }
     }
 
@@ -59,6 +71,17 @@ public class AlertsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_alerts, container, false);
+
+        return inflater.inflate(R.layout.fragment_plant_detailed, container, false);
+    }
+
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        plantDetailedTextView = view.findViewById(R.id.plantDetailedTextView);
+        plantDetailedImageView = view.findViewById(R.id.plantDetailedImageView);
+
+        plantDetailedTextView.setText(title);
+        Glide.with(getContext())
+                .load(image)
+                .into(plantDetailedImageView);
     }
 }

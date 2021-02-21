@@ -1,18 +1,18 @@
-package com.e.letsplant;
+package com.e.letsplant.activities;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -22,41 +22,38 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+import com.e.letsplant.R;
+import com.e.letsplant.data.User;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity {
+public class SignActivity extends MainActivity {
+
     private TextView signTextView;
     private RelativeLayout usernameRelativeLayout;
-    private RelativeLayout emailRelativeLayout;
     private RelativeLayout confirmPasswordRelativeLayout;
     private LinearLayout forgetPasswordLinearLayout;
     private Button signButton;
     private LinearLayout orLinearLayout;
     private TextView backToTextView;
     private Boolean viewSignIn = true;
-    private EditText username, email, password, confirmpassword;
+    private EditText username, email, password, confirmPassword;
     private ProgressBar progressBar;
     private FirebaseAuth fAuth;
     private FirebaseFirestore fStore;
-    String userID;
+    private String userID;
+    private String User_Realtime_Database = "All_Users_Information_Realtime_Database";
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        //Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
         setContentView(R.layout.activity_sign);
-
 
         initialize();
         checkWhatToShowOnLayout();
@@ -65,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
     private void initialize() {
         signTextView = findViewById(R.id.signTextView);
         usernameRelativeLayout = findViewById(R.id.usernameRelativeLayout);
-        emailRelativeLayout = findViewById(R.id.emailRelativeLayout);
         confirmPasswordRelativeLayout = findViewById(R.id.confirmPasswordRelativeLayout);
         forgetPasswordLinearLayout = findViewById(R.id.forgetPasswordLinearLayout);
         signButton = findViewById(R.id.signButton);
@@ -73,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         backToTextView = findViewById(R.id.backToTextView);
         username = findViewById(R.id.username);
         email = findViewById(R.id.email);
-        confirmpassword = findViewById(R.id.confirmPassword);
+        confirmPassword = findViewById(R.id.confirmPassword);
         password = findViewById(R.id.password);
         progressBar = findViewById(R.id.progressBar_cyclic);
 
@@ -146,21 +142,18 @@ public class MainActivity extends AppCompatActivity {
 
         if (textSignButton.equals("Sign In")) {
             progressBar.setVisibility(View.VISIBLE);
-            fAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()) {
-                        startActivity(new Intent(getApplicationContext(), SecondActivity.class));
-                        finish();
-                    } else {
-                        Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        progressBar.setVisibility(View.GONE);
-                    }
+            fAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    startActivity(new Intent(getApplicationContext(), SecondActivity.class));
+                    finish();
+                } else {
+                    Toast.makeText(SignActivity.this, Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
                 }
             });
         } else {
             String username = this.username.getText().toString().trim();
-            String confirmPassword = this.confirmpassword.getText().toString().trim();
+            String confirmPassword = this.confirmPassword.getText().toString().trim();
 
             if (TextUtils.isEmpty(username)) {
                 this.username.setError("Username is required!");
@@ -171,31 +164,24 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
             if (!confirmPassword.equals(password)) {
-                this.confirmpassword.setError("Password does not match!");
+                this.confirmPassword.setError("Password does not match!");
                 return;
             }
 
             progressBar.setVisibility(View.VISIBLE);
-            fAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()) {
-                        userID = fAuth.getCurrentUser().getUid();
-                        DocumentReference documentReference = fStore.collection("users").document(userID);
-                        Map<String, Object> user = new HashMap<>();
-                        user.put("username", username);
-                        user.put("email", email);
-                        documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                            }
-                        });
-                        startActivity(new Intent(getApplicationContext(), SecondActivity.class));
-                        finish();
-                    } else {
-                        Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        progressBar.setVisibility(View.GONE);
-                    }
+            fAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    userID = Objects.requireNonNull(fAuth.getCurrentUser()).getUid();
+                    User user = new User(email, "", "", "", username);
+
+                    DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                    mDatabase.child(User_Realtime_Database).child(userID).setValue(user);
+
+                    startActivity(new Intent(getApplicationContext(), SecondActivity.class));
+                    finish();
+                } else {
+                    Toast.makeText(SignActivity.this, Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
                 }
             });
         }
@@ -208,34 +194,31 @@ public class MainActivity extends AppCompatActivity {
         passwordResetDialog.setMessage("Enter your email to receive reset link");
         passwordResetDialog.setView(resetMail);
 
-        passwordResetDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String mail = resetMail.getText().toString().trim();
-                if (TextUtils.isEmpty(mail)) {
-                    resetMail.setError("Email is required!");
-                    return;
-                }
-                fAuth.sendPasswordResetEmail(mail).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(MainActivity.this, "Reset link sent to your email", Toast.LENGTH_SHORT).show();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+        passwordResetDialog.setPositiveButton("Yes", (dialog, which) -> {
+            String mail = resetMail.getText().toString().trim();
+            if (TextUtils.isEmpty(mail)) {
+                resetMail.setError("Email is required!");
+                return;
             }
+            fAuth.sendPasswordResetEmail(mail).addOnSuccessListener(aVoid -> Toast.makeText(SignActivity.this, "Reset link sent to your email", Toast.LENGTH_SHORT).show()).addOnFailureListener(e -> Toast.makeText(SignActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show());
         });
-        passwordResetDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        });
-
+        passwordResetDialog.setNegativeButton("No", (dialog, which) -> {});
         passwordResetDialog.create().show();
+    }
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            View v = getCurrentFocus();
+            if ( v instanceof EditText) {
+                Rect outRect = new Rect();
+                v.getGlobalVisibleRect(outRect);
+                if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
+                    v.clearFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                }
+            }
+        }
+        return super.dispatchTouchEvent(event);
     }
 }

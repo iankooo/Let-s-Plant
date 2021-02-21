@@ -1,4 +1,4 @@
-package com.e.letsplant;
+package com.e.letsplant.data;
 
 public class PostModel {
     private String ownerName;

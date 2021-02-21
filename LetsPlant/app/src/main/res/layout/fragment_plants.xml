@@ -3,13 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PlantsFragment">
+    tools:context=".fragments.PlantsFragment">
 
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".PlantsFragment">
+        tools:context=".fragments.PlantsFragment"
+        tools:ignore="UselessParent">
 
         <androidx.cardview.widget.CardView xmlns:cardView="http://schemas.android.com/apk/res-auto"
             android:id="@+id/cardView"
@@ -39,7 +40,7 @@
                     android:layout_height="match_parent"
                     android:layout_margin="8dp"
                     android:gravity="center_vertical"
-                    android:hint="Enter name"
+                    android:hint="@string/enter_name"
                     android:inputType="text"
                     android:lines="1"
                     android:maxLines="1"
@@ -48,7 +49,8 @@
                     cardView:layout_constraintBottom_toBottomOf="parent"
                     cardView:layout_constraintLeft_toRightOf="@id/imageView"
                     cardView:layout_constraintRight_toRightOf="parent"
-                    cardView:layout_constraintTop_toTopOf="parent" />
+                    cardView:layout_constraintTop_toTopOf="parent"
+                    android:importantForAutofill="no" />
 
                 <ImageView
                     android:id="@+id/uploadImageView"
@@ -73,13 +75,13 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnUpload"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginHorizontal="32dp"
                 android:layout_weight="1"
                 android:background="@drawable/rounded_button"
-                android:text="Upload"
+                android:text="@string/upload"
                 android:textAllCaps="false"
                 android:textColor="#E5E5E5"
                 android:textSize="16sp"

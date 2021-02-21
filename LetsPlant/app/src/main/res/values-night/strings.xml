@@ -11,4 +11,12 @@
     <string name="edit_text_confirm_password">Confirm password</string>
     <string name="text_view_sign_in">Sign In</string>
     <string name="text_view_back_to">Back to&#160;</string>
+    <string name="enter_name">Enter name</string>
+    <string name="upload">Upload</string>
+    <string name="your_location">Location</string>
+    <string name="your_phone_number">Phone</string>
+    <string name="your_username">Username</string>
+    <string name="your_email">Email</string>
+    <string name="profile">Profile</string>
+    <string name="logout">Logout</string>
 </resources>

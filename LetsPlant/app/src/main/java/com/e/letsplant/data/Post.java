@@ -1,9 +1,5 @@
 package com.e.letsplant.data;
 
-import com.e.letsplant.PostModel;
-
-import java.util.ArrayList;
-
 public class Post {
     private String ownerName;
 

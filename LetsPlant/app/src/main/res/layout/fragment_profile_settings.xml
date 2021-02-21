@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/profileSettingsLinearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_fragment_profile_settings"
+    android:orientation="vertical"
+    app:behavior_peekHeight="40sp"
+    app:layout_behavior="@string/bottom_sheet_behavior">
+
+    <ImageView
+        android:id="@+id/minusProfileSettingsImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="20sp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:src="@drawable/ic_minus" />
+
+    <LinearLayout
+        android:id="@+id/editProfileLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="24sp"
+        android:layout_margin="10sp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        tools:ignore="UseCompoundDrawables">
+
+        <ImageView
+            android:layout_width="24sp"
+            android:layout_height="24sp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_edit" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10sp"
+            android:text="Edit profile"
+            android:textColor="#808080"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="44sp"
+        android:background="#808080" />
+
+    <LinearLayout
+        android:id="@+id/logoutLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="24sp"
+        android:layout_margin="10sp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        tools:ignore="UseCompoundDrawables">
+
+        <ImageView
+            android:layout_width="24sp"
+            android:layout_height="24sp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_log_out" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="10sp"
+            android:text="Logout"
+            android:textColor="#808080"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="44sp"
+        android:background="#808080"
+        android:layout_marginBottom="20sp"/>
+
+    <LinearLayout
+        android:id="@+id/layoutDelete"
+        android:layout_width="match_parent"
+        android:layout_height="35sp"
+        android:layout_marginStart="10sp"
+        android:layout_marginEnd="10sp"
+        android:layout_marginBottom="10sp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:ignore="UseCompoundDrawables">
+
+        <ImageView
+            android:layout_width="22sp"
+            android:layout_height="22sp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_delete"
+            app:tint="@color/colorDelete" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10sp"
+            android:text="Delete note"
+            android:textColor="@color/colorDelete"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+</LinearLayout>

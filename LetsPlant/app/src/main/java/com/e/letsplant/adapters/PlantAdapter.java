@@ -1,4 +1,4 @@
-package com.e.letsplant;
+package com.e.letsplant.adapters;
 
 import android.content.Context;
 import android.util.Log;
@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.e.letsplant.R;
 import com.e.letsplant.data.Plant;
 import com.squareup.picasso.Picasso;
 

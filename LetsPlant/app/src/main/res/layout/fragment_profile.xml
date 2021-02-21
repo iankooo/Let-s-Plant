@@ -1,75 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileFragment">
+    tools:context=".fragments.ProfileFragment">
 
-    <RelativeLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
-            android:id="@+id/profileLinearLayout"
-            android:layout_marginTop="75dp"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:id="@+id/profileRelativeLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true">
+            android:layout_centerHorizontal="true"
+            android:layout_marginVertical="25dp">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_marginHorizontal="25dp"
+                app:cardCornerRadius="33dp">
+
+            <ImageView
+                android:id="@+id/profileImageView"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+
+                android:src="@mipmap/ic_launcher"
+                android:scaleType="centerCrop" />
+            </androidx.cardview.widget.CardView>
 
             <TextView
+                android:id="@+id/titleFragmentProfileTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Profile"
-                android:textStyle="bold"
-                android:textSize="25sp"
-                android:textAlignment="center" />
-        </LinearLayout>
+                android:layout_centerInParent="true"
+                android:layout_toEndOf="@+id/cardView"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/profileInfoLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/profileLinearLayout"
-            android:weightSum="2"
-            android:layout_marginTop="75dp">
-            <ImageView
-                android:layout_width="75dp"
-                android:layout_height="75dp"
-                android:layout_weight="1"
-                android:src="@mipmap/ic_launcher"/>
-            <LinearLayout
-                android:layout_width="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="vertical"
+            android:paddingHorizontal="25dp"
+            app:layout_anchor="@id/profileRelativeLayout"
+            app:layout_anchorGravity="bottom">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-                <TextView
-                    android:id="@+id/usernameTextView"
-                    android:layout_width="wrap_content"
+                android:hint="@string/your_email">
+
+                <EditText
+                    android:id="@+id/emailEditText"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Your username"/>
-                <TextView
-                    android:id="@+id/emailTextView"
-                    android:layout_width="wrap_content"
+                    android:ems="10"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1"
+                    android:textSize="14sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/your_username">
+
+                <EditText
+                    android:id="@+id/usernameEditText"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Your email"/>
-            </LinearLayout>
+                    android:ems="10"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textSize="14sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/your_phone_number">
+
+                <EditText
+                    android:id="@+id/phoneEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="phone"
+                    android:maxLines="1"
+                    android:textSize="14sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/your_location">
+
+                <EditText
+                    android:id="@+id/locationEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textSize="14sp" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/logoutButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginHorizontal="32dp"
-            android:layout_marginTop="100dp"
-            android:layout_below="@+id/profileInfoLinearLayout"
-            android:background="@drawable/rounded_button"
-            android:backgroundTint="@null"
-            android:text="Logout"
-            android:textAllCaps="false"
-            android:textColor="#E5E5E5"
-            android:textSize="16sp" />
-
-    </RelativeLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </FrameLayout>
