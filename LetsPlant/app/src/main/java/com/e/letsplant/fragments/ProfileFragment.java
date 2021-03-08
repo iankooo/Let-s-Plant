@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -24,13 +25,23 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.e.letsplant.R;
 import com.e.letsplant.data.User;
+import com.e.letsplant.data.UserViewModel;
 import com.e.letsplant.interfaces.ProfileSettingsEventListener;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -39,11 +50,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
@@ -55,20 +72,21 @@ public class ProfileFragment extends MainFragment {
 
     private EditText username, email, phone, location;
     private ImageView profileImage;
+    double latitude = 0;
+    double longitude = 0;
     private TextView titleFragmentProfileTextView;
     private View rootView;
 
-    private FirebaseAuth fAuth;
-    private FirebaseFirestore fStore;
-    private FirebaseUser firebaseUser;
     private String userUid;
-    private DatabaseReference mDatabase;
 
     private Menu menu;
 
     private Uri filePath;
 
-    String Database_Path = "All_Users_Information_Realtime_Database";
+    private UserViewModel userViewModel;
+
+    private StorageReference storageReference;
+    private DatabaseReference databaseReference;
 
     BroadcastReceiver receiverUpdateDownload = new BroadcastReceiver() {
         @Override
@@ -112,40 +130,46 @@ public class ProfileFragment extends MainFragment {
 
         initialize(false);
 
-        fAuth = FirebaseAuth.getInstance();
-        fStore = FirebaseFirestore.getInstance();
-        firebaseUser = fAuth.getCurrentUser();
-        userUid = firebaseUser.getUid();
-        mDatabase = FirebaseDatabase.getInstance().getReference(Database_Path + "/");
+        userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        storageReference = FirebaseStorage.getInstance().getReference();
+        databaseReference = FirebaseDatabase.getInstance().getReference(USERS_INFORMATION_REALTIME_DATABASE + "/" + userUid);
 
         ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage("Loading profile");
         progressDialog.show();
 
-        ValueEventListener userListener = new ValueEventListener() {
+        databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                User user = snapshot.getValue(User.class);
-
-                if (!user.getProfileImage().equals("")) {
+                currentUserInfo = snapshot.getValue(User.class);
+                if (currentUserInfo == null) {
+                    Log.e(TAG, "User data is null");
+                    progressDialog.dismiss();
+                    return;
+                }
+                if (!currentUserInfo.getProfileImage().equals("null") && !currentUserInfo.getProfileImage().equals("")) {
                     Glide.with(getContext())
-                            .load(user.getProfileImage())
+                            .load(currentUserInfo.getProfileImage())
                             .into(profileImage);
-                } else
+                } else {
                     profileImage.setImageResource(R.drawable.ic_user_rounded);
-                username.setText(user.getUsername());
-                email.setText(user.getEmail());
-                phone.setText(user.getPhone());
-                location.setText(user.getLocation());
+                }
+                email.setText(currentUserInfo.getEmail());
+                username.setText(currentUserInfo.getUsername());
+                phone.setText(currentUserInfo.getPhone());
+                location.setText(currentUserInfo.getLocation());
+
+                userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+                userViewModel.setUserMutableLiveData(currentUserInfo);
+
                 progressDialog.dismiss();
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w(TAG, "loadUser:onCancelled", error.toException());
             }
-        };
-        mDatabase.child(userUid).addValueEventListener(userListener);
+        });
 
         IntentFilter filter = new IntentFilter("openEditProfileSettings");
         getActivity().registerReceiver(receiverUpdateDownload, filter);
@@ -183,24 +207,33 @@ public class ProfileFragment extends MainFragment {
 
         if (!value) {
             titleFragmentProfileTextView.setText("Profile");
+            if (!currentUserInfo.getProfileImage().equals("null") && !currentUserInfo.getProfileImage().equals("")) {
+                Glide.with(getContext())
+                        .load(currentUserInfo.getProfileImage())
+                        .into(profileImage);
+            } else {
+                profileImage.setImageResource(R.drawable.ic_user_rounded);
+            }
             email.setBackgroundResource(android.R.color.transparent);
             username.setBackgroundResource(android.R.color.transparent);
             phone.setBackgroundResource(android.R.color.transparent);
             location.setBackgroundResource(android.R.color.transparent);
         } else {
             titleFragmentProfileTextView.setText("Edit Profile");
-            if (profileImage == null)
-                profileImage.setImageResource(R.drawable.ic_add_user_rounded);
+            profileImage.setImageResource(R.drawable.ic_add_user_rounded);
             email.setBackgroundResource(android.R.drawable.edit_text);
             username.setBackgroundResource(android.R.drawable.edit_text);
             phone.setBackgroundResource(android.R.drawable.edit_text);
             location.setBackgroundResource(android.R.drawable.edit_text);
 
-            profileImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    SelectImage();
-                }
+            profileImage.setOnClickListener(v -> SelectImage());
+
+            Places.initialize(getContext(), "");
+            location.setFocusable(false);
+            location.setOnClickListener(v -> {
+                List<Place.Field> fieldList = Arrays.asList(Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.NAME);
+                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList).build(getActivity());
+                startActivityForResult(intent, 100);
             });
         }
     }
@@ -228,6 +261,7 @@ public class ProfileFragment extends MainFragment {
         inflater.inflate(R.menu.top_profile_bar_menu, menu);
         menu.getItem(0).setVisible(false);
         menu.getItem(1).setVisible(false);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -271,23 +305,28 @@ public class ProfileFragment extends MainFragment {
             this.username.setError("Username must be >= 4  characters");
             return;
         }
-        User user = new User(email, location, phone, profileImage, username);
+
+        User user = new User(userUid, email, location, latitude, longitude, phone, profileImage, username);
+
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        userViewModel.setUserMutableLiveData(user);
+
         Map<String, Object> userValues = user.toMap();
 
-        Map<String, Object> userUpdates = new HashMap<>();
-        userUpdates.put(userUid, userValues);
-
-        mDatabase.updateChildren(userUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+        databaseReference.updateChildren(userValues).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    initialize(false);
                     menu.getItem(0).setVisible(false);
                     menu.getItem(1).setVisible(false);
                     menu.getItem(2).setVisible(true);
                 }
             }
         });
+        if (!profileImage.equals("")) {
+            uploadImage();
+        }
+        initialize(false);
     }
 
     @Override
@@ -302,6 +341,50 @@ public class ProfileFragment extends MainFragment {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+        if (requestCode == 100 && resultCode == RESULT_OK) {
+            Place place = Autocomplete.getPlaceFromIntent(data);
+            location.setText(place.getAddress());
+            latitude = place.getLatLng().latitude;
+            longitude = place.getLatLng().longitude;
+        } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
+            Status status = Autocomplete.getStatusFromIntent(data);
+            Toast.makeText(getContext(), status.getStatusMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void uploadImage() {
+        if (filePath != null) {
+            ProgressDialog progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setMessage("Updating...");
+            progressDialog.show();
+
+            StorageReference ref = storageReference.child(ALL_USER_PROFILE_IMAGES + "/" + userUid + "." + GetFileExtension(filePath));
+
+            ref.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    if (taskSnapshot.getMetadata() != null) {
+                        if (taskSnapshot.getMetadata().getReference() != null) {
+                            Task<Uri> result = taskSnapshot.getStorage().getDownloadUrl();
+                            result.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    String imageUrl = uri.toString();
+                                    progressDialog.dismiss();
+                                    databaseReference.child("profileImage").setValue(imageUrl);
+                                }
+                            });
+                        }
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    progressDialog.dismiss();
+                    Toast.makeText(getActivity(), "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 }

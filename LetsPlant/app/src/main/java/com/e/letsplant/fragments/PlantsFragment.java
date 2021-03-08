@@ -207,6 +207,7 @@ public class PlantsFragment extends MainFragment {
     @Override
     public void onCreateOptionsMenu(@NotNull Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.top_plants_bar_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -242,17 +243,6 @@ public class PlantsFragment extends MainFragment {
                 e.printStackTrace();
             }
         }
-    }
-
-    public String GetFileExtension(Uri uri) {
-
-        ContentResolver contentResolver = getActivity().getContentResolver();
-
-        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
-
-        // Returning the file Extension.
-        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
-
     }
 
     private void uploadImage() {

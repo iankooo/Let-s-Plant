@@ -18,8 +18,8 @@
         android:title="" />
     <item
         android:id="@+id/app_bar_alerts"
-        android:icon="@drawable/ic_bell"
-        android:title="Alerts"
+        android:icon="@drawable/ic_followers"
+        android:title="Friends"
         app:showAsAction="always" />
     <item
         android:id="@+id/app_bar_profile"

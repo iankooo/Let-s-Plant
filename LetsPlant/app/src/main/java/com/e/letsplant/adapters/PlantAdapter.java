@@ -42,8 +42,7 @@ public class PlantAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Plant plantUploadInfo = plantList.get(position);
         ((PlantViewHolder)holder).title.setText(plantUploadInfo.getTitle());
-        //Picasso.get().load(plantUploadInfo.getImage()).into(((PlantViewHolder) holder).image);
-        //Loading image from Glide library.
+
         Log.d("GLIDE",plantUploadInfo.getImage());
         Glide.with(context)
                 .load(plantUploadInfo.getImage())

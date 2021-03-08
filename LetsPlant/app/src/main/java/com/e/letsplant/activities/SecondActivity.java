@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
 
 import com.e.letsplant.R;
 import com.e.letsplant.data.Plant;
-import com.e.letsplant.fragments.AlertsFragment;
+import com.e.letsplant.fragments.FriendsFragment;
 import com.e.letsplant.fragments.ExploreFragment;
 import com.e.letsplant.fragments.FeedFragment;
 import com.e.letsplant.fragments.PlantDetailedFragment;
@@ -69,7 +69,7 @@ public class SecondActivity extends MainActivity implements PlantsFragment.OnIte
                     ExploreFragment exploreFragment = new ExploreFragment();
                     getSupportFragmentManager()
                             .beginTransaction()
-                            .setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right, R.anim.enter_from_left, R.anim.exit_to_right)
+                            //.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right, R.anim.enter_from_left, R.anim.exit_to_right)
                             .replace(R.id.fragment_container, exploreFragment) // replace fragment_container
                             .addToBackStack(null)
                             .commit();
@@ -80,7 +80,7 @@ public class SecondActivity extends MainActivity implements PlantsFragment.OnIte
                         PlantsFragment plantsFragment = new PlantsFragment();
                         getSupportFragmentManager()
                                 .beginTransaction()
-                                .setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right, R.anim.enter_from_left, R.anim.exit_to_right)
+                                //.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right, R.anim.enter_from_left, R.anim.exit_to_right)
                                 .replace(R.id.fragment_container, plantsFragment) // replace fragment_container
                                 .addToBackStack(null)
                                 .commit();
@@ -89,7 +89,7 @@ public class SecondActivity extends MainActivity implements PlantsFragment.OnIte
                         PlantsFragment plantsFragment = new PlantsFragment();
                         getSupportFragmentManager()
                                 .beginTransaction()
-                                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_right, R.anim.exit_to_left)
+                                //.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_right, R.anim.exit_to_left)
                                 .replace(R.id.fragment_container, plantsFragment) // replace fragment_container
                                 .addToBackStack(null)
                                 .commit();
@@ -98,20 +98,20 @@ public class SecondActivity extends MainActivity implements PlantsFragment.OnIte
                 }
                 case R.id.app_bar_alerts: {
                     if (!isAnimationFromProfileToAlerts) {
-                        AlertsFragment alertsFragment = new AlertsFragment();
+                        FriendsFragment friendsFragment = new FriendsFragment();
                         getSupportFragmentManager()
                                 .beginTransaction()
-                                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_right, R.anim.exit_to_left)
-                                .replace(R.id.fragment_container, alertsFragment) // replace fragment_container
+                                //.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_right, R.anim.exit_to_left)
+                                .replace(R.id.fragment_container, friendsFragment) // replace fragment_container
                                 .addToBackStack(null)
                                 .commit();
                     } else {
                         isAnimationFromProfileToAlerts = false;
-                        AlertsFragment alertsFragment = new AlertsFragment();
+                        FriendsFragment friendsFragment = new FriendsFragment();
                         getSupportFragmentManager()
                                 .beginTransaction()
-                                .setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right, R.anim.enter_from_left, R.anim.exit_to_right)
-                                .replace(R.id.fragment_container, alertsFragment) // replace fragment_container
+                                //.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right, R.anim.enter_from_left, R.anim.exit_to_right)
+                                .replace(R.id.fragment_container, friendsFragment) // replace fragment_container
                                 .addToBackStack(null)
                                 .commit();
                     }
@@ -122,7 +122,7 @@ public class SecondActivity extends MainActivity implements PlantsFragment.OnIte
                     ProfileFragment profileFragment = new ProfileFragment();
                     getSupportFragmentManager()
                             .beginTransaction()
-                            .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_right, R.anim.exit_to_left)
+                            //.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_right, R.anim.exit_to_left)
                             .replace(R.id.fragment_container, profileFragment) // replace fragment_container
                             .addToBackStack(null)
                             .commit();
@@ -139,7 +139,7 @@ public class SecondActivity extends MainActivity implements PlantsFragment.OnIte
         FeedFragment feedFragment = new FeedFragment();
         getSupportFragmentManager()
                 .beginTransaction()
-                .setCustomAnimations(R.animator.slide_up, 0, 0, R.animator.slide_down)
+                //.setCustomAnimations(R.animator.slide_up, 0, 0, R.animator.slide_down)
                 .replace(R.id.fragment_container, feedFragment) // replace fragment_container
                 .addToBackStack(null)
                 .commit();

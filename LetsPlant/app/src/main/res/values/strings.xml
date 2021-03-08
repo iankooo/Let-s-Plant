@@ -18,7 +18,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_explore_fragment">Hello explore fragment</string>
     <string name="hello_plants_fragment">Hello plants fragment</string>
-    <string name="hello_alerts_fragment">Hello alerts fragment</string>
+    <string name="hello_friends_fragment">No friends yet!</string>
     <string name="hello_profile_fragment">Hello profile fragment</string>
     <string name="hello_feed_fragment">Hello feed fragment</string>
     <string name="enter_name">Enter name</string>

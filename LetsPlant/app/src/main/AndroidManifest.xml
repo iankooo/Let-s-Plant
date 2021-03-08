@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission. ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -15,6 +17,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LetsPlant">
+        <meta-data android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyAYJE72q4PNe5oH5GbT2OHV186UO3t30qo" />
         <activity
             android:name=".activities.SecondActivity"
             android:windowSoftInputMode="adjustPan" />

@@ -1,6 +1,7 @@
 package com.e.letsplant.activities;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -24,10 +25,14 @@ import android.widget.Toast;
 
 import com.e.letsplant.R;
 import com.e.letsplant.data.User;
+import com.e.letsplant.data.UserViewModel;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Objects;
 
@@ -44,15 +49,14 @@ public class SignActivity extends MainActivity {
     private EditText username, email, password, confirmPassword;
     private ProgressBar progressBar;
     private FirebaseAuth fAuth;
-    private FirebaseFirestore fStore;
     private String userID;
-    private String User_Realtime_Database = "All_Users_Information_Realtime_Database";
+    private final String USER_REALTIME_DATABASE = "All_Users_Information_Realtime_Database";
+    private UserViewModel userViewModel;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
         setContentView(R.layout.activity_sign);
 
         initialize();
@@ -74,7 +78,6 @@ public class SignActivity extends MainActivity {
         progressBar = findViewById(R.id.progressBar_cyclic);
 
         fAuth = FirebaseAuth.getInstance();
-        fStore = FirebaseFirestore.getInstance();
 
         if (fAuth.getCurrentUser() != null) {
             startActivity(new Intent(getApplicationContext(), SecondActivity.class));
@@ -172,10 +175,15 @@ public class SignActivity extends MainActivity {
             fAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     userID = Objects.requireNonNull(fAuth.getCurrentUser()).getUid();
-                    User user = new User(email, "", "", "", username);
+                    User user = new User(userID, email, "", 0 , 0,  "", "", username);
+
+                    userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+                    userViewModel.getUserMutableLiveData().observe(this, item -> {
+                        userViewModel.setUserMutableLiveData(user);
+                    });
 
                     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                    mDatabase.child(User_Realtime_Database).child(userID).setValue(user);
+                    mDatabase.child(USER_REALTIME_DATABASE).child(userID).setValue(user);
 
                     startActivity(new Intent(getApplicationContext(), SecondActivity.class));
                     finish();

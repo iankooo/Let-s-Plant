@@ -1,44 +1,53 @@
 package com.e.letsplant.fragments;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
-import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.e.letsplant.R;
+import com.e.letsplant.data.User;
+import com.e.letsplant.data.UserViewModel;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ExploreFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class ExploreFragment extends Fragment {
+import java.util.ArrayList;
+import java.util.List;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+public class ExploreFragment extends MainFragment implements GoogleMap.OnMarkerClickListener, OnMapReadyCallback {
+
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private View rootView;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private LatLng CURRENT_LOCATION = new LatLng(0,0);
+
+    private Marker markerCurrentLocation;
+
+    private UserViewModel userViewModel;
+    private User currentUser;
 
     public ExploreFragment() {
-        // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ExploreFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static ExploreFragment newInstance(String param1, String param2) {
         ExploreFragment fragment = new ExploreFragment();
         Bundle args = new Bundle();
@@ -51,16 +60,76 @@ public class ExploreFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_explore, container, false);
+        rootView = inflater.inflate(R.layout.fragment_explore, null, false);
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        currentUser = userViewModel.getUserMutableLiveData().getValue();
+        if (currentUser != null)
+            CURRENT_LOCATION = new LatLng(currentUser.getLatitude(), currentUser.getLongitude());
+
+        SupportMapFragment mapFragment =
+                (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        return rootView;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        if (currentUser != null)
+            markerCurrentLocation = map.addMarker(new MarkerOptions()
+                    .position(CURRENT_LOCATION)
+                    .icon(bitmapDescriptorFromVector(getActivity()))
+                    .title(currentUser.getUsername())
+                    .snippet(currentUser.getPhone())
+            );
+        else
+            markerCurrentLocation = map.addMarker(new MarkerOptions()
+                    .position(CURRENT_LOCATION)
+                    .icon(bitmapDescriptorFromVector(getActivity()))
+            );
+        markerCurrentLocation.setTag(0);
+
+        List<Marker> markers = new ArrayList<>();
+        markers.add(markerCurrentLocation);
+
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (Marker m : markers) {
+            builder.include(m.getPosition());
+        }
+        LatLngBounds bounds = builder.build();
+
+        int padding = 0;
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+        map.animateCamera(cu);
+
+        map.setOnMarkerClickListener(this);
+    }
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, R.drawable.ic_pin);
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    @Override
+    public boolean onMarkerClick(final Marker marker) {
+        Integer clickCount = (Integer) marker.getTag();
+
+        if (clickCount != null) {
+            clickCount = clickCount + 1;
+            marker.setTag(clickCount);
+            Toast.makeText(getContext(),
+                    marker.getTitle() +
+                            " has been clicked " + clickCount + " times.",
+                    Toast.LENGTH_SHORT).show();
+        }
+        return false;
     }
 }
