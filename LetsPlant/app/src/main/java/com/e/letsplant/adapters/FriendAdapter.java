@@ -31,7 +31,6 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     Context context;
     List<User> usersList;
 
-    //for getting current user's uid
     FirebaseAuth firebaseAuth;
     String userUid;
 
@@ -111,7 +110,6 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
                             }
                             else
                                 holder.addFriendTextView.setImageResource(R.drawable.ic_add_user);
-                            //usersList.get(position).setFriend(false);
                         }
                     }
 

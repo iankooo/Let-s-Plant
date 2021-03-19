@@ -5,12 +5,14 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaRouter;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -76,45 +78,17 @@ public class PlantsFragment extends MainFragment {
     StorageReference storageReference;
     DatabaseReference databaseReference;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     public PlantsFragment() {
-        // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PlantsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static PlantsFragment newInstance(String param1, String param2) {
-        PlantsFragment fragment = new PlantsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+        return new PlantsFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -132,17 +106,11 @@ public class PlantsFragment extends MainFragment {
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
-//        plantAdapter.setOnItemClickListener(new ClickListener<Plant>() {
-//            @Override
-//            public void onItemClick(Plant data) {
-//                Toast.makeText(MainActivity.this, data.getTitle(), Toast.LENGTH_SHORT).show();
-//            }
-//        });
+
         String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
         databaseReference = FirebaseDatabase.getInstance().getReference(Database_Path + "/" + userUid);
-
 
         ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage("Loading plants");
@@ -184,14 +152,6 @@ public class PlantsFragment extends MainFragment {
                 .OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-//                Toast.makeText(getContext(),"clicked" + position, Toast.LENGTH_SHORT).show();
-//                PlantDetailedFragment plantDetailedFragment = new PlantDetailedFragment();
-//                getActivity().getSupportFragmentManager()
-//                        .beginTransaction()
-////                        .setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right, R.anim.enter_from_left, R.anim.exit_to_right)
-//                        .replace(R.id.fragment_container, plantDetailedFragment) // replace fragment_container
-//                        .addToBackStack(null)
-//                        .commit();
                 listener.onPlantItemSelected(plantList.get(position));
             }
 
@@ -221,7 +181,6 @@ public class PlantsFragment extends MainFragment {
             SelectImage();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

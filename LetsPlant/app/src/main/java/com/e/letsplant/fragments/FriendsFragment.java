@@ -37,43 +37,27 @@ import java.util.List;
 
 public class FriendsFragment extends MainFragment {
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
     private final List<User> usersList = new ArrayList<>();
     private final List<User> friendsList = new ArrayList<>();
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private TextView noFriendsMessageTextView;
+    private RecyclerView recyclerView;
+    private UserAdapter userAdapter;
 
-    TextView noFriendsMessageTextView;
-    RecyclerView recyclerView;
-    UserAdapter userAdapter;
-
-    FirebaseUser firebaseUser;
-    DatabaseReference databaseReference;
+    private FirebaseUser firebaseUser;
+    private DatabaseReference databaseReference;
 
     public FriendsFragment() {
     }
 
     public static FriendsFragment newInstance(String param1, String param2) {
-        FriendsFragment fragment = new FriendsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+        return new FriendsFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -120,7 +104,6 @@ public class FriendsFragment extends MainFragment {
 
             }
         });
-
     }
 
     @Override

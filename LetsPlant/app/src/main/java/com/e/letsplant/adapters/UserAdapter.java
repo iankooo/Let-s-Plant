@@ -36,9 +36,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     private final List<User> usersList;
     private final LayoutInflater layoutInflater;
 
-    //for getting current user's uid
-    FirebaseAuth firebaseAuth;
-    String userUid;
+    private final FirebaseAuth firebaseAuth;
+    private final String userUid;
 
     public UserAdapter(Context context, List<User> usersList) {
         this.context = context;
@@ -111,7 +110,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             if (dataSnapshot.exists()) {
-                                holder.actionTextView.setImageResource(R.drawable.ic_user);
+                                holder.actionTextView.setImageResource(R.drawable.ic_user_24dp);
                                 usersList.get(position).setFriend(true);
                             } else
                                 holder.actionTextView.setImageResource(R.drawable.ic_add_user);

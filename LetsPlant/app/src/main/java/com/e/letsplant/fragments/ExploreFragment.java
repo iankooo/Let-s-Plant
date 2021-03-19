@@ -103,10 +103,14 @@ public class ExploreFragment extends MainFragment implements GoogleMap.OnMarkerC
         }
         LatLngBounds bounds = builder.build();
 
-        int padding = 0;
-        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-        map.animateCamera(cu);
-
+        map.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                int padding = 0;
+                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                map.animateCamera(cu);
+            }
+        });
         map.setOnMarkerClickListener(this);
     }
     private BitmapDescriptor bitmapDescriptorFromVector(Context context) {
