@@ -1,8 +1,6 @@
 package com.e.letsplant.data;
 
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.firebase.database.Exclude;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,18 +31,6 @@ public class User {
         this.phone = phone;
         this.profileImage = profileImage;
         this.username = username;
-    }
-
-    public User(String id, String email, String location, double latitude, double longitude, String phone, String profileImage, String username, boolean isFriend) {
-        this.id = id;
-        this.email = email;
-        this.location = location;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.phone = phone;
-        this.profileImage = profileImage;
-        this.username = username;
-        this.isFriend = isFriend;
     }
 
     public String getId() {

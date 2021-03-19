@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.provider.MediaStore;
@@ -62,6 +63,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.ContentValues.TAG;
@@ -70,23 +72,19 @@ public class ProfileFragment extends MainFragment {
     private ProfileSettingsEventListener profileSettingsEventListener;
     private boolean isProfileSettingsOpen = false;
 
-    private EditText username, email, phone, location;
-    private ImageView profileImage;
-    double latitude = 0;
-    double longitude = 0;
     private TextView titleFragmentProfileTextView;
-    private View rootView;
-
-    private String userUid;
-
+    private ImageView profileImage;
+    private EditText email;
+    private EditText username;
+    private EditText phone;
+    private EditText location;
     private Menu menu;
-
     private Uri filePath;
 
     private UserViewModel userViewModel;
 
-    private StorageReference storageReference;
-    private DatabaseReference databaseReference;
+    private double latitude = 0;
+    private double longitude = 0;
 
     BroadcastReceiver receiverUpdateDownload = new BroadcastReceiver() {
         @Override
@@ -115,18 +113,19 @@ public class ProfileFragment extends MainFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setTitle("Profile");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        titleFragmentProfileTextView = rootView.findViewById(R.id.titleFragmentProfileTextView);
         profileImage = rootView.findViewById(R.id.profileImageView);
-        username = rootView.findViewById(R.id.usernameEditText);
         email = rootView.findViewById(R.id.emailEditText);
+        username = rootView.findViewById(R.id.usernameEditText);
         phone = rootView.findViewById(R.id.phoneEditText);
         location = rootView.findViewById(R.id.locationEditText);
-        titleFragmentProfileTextView = rootView.findViewById(R.id.titleFragmentProfileTextView);
 
         initialize(false);
 
@@ -218,9 +217,9 @@ public class ProfileFragment extends MainFragment {
             username.setBackgroundResource(android.R.color.transparent);
             phone.setBackgroundResource(android.R.color.transparent);
             location.setBackgroundResource(android.R.color.transparent);
+            profileImage.setOnClickListener(null);
         } else {
-            titleFragmentProfileTextView.setText("Edit Profile");
-            profileImage.setImageResource(R.drawable.ic_add_user_rounded);
+            titleFragmentProfileTextView.setText("Tap to change");
             email.setBackgroundResource(android.R.drawable.edit_text);
             username.setBackgroundResource(android.R.drawable.edit_text);
             phone.setBackgroundResource(android.R.drawable.edit_text);

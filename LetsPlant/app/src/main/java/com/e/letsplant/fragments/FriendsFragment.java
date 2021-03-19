@@ -3,6 +3,7 @@ package com.e.letsplant.fragments;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class FriendsFragment extends MainFragment {
 
@@ -43,9 +45,6 @@ public class FriendsFragment extends MainFragment {
     private TextView noFriendsMessageTextView;
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
-
-    private FirebaseUser firebaseUser;
-    private DatabaseReference databaseReference;
 
     public FriendsFragment() {
     }
@@ -58,29 +57,29 @@ public class FriendsFragment extends MainFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setTitle("");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_friends, container, false);
+        rootView = inflater.inflate(R.layout.fragment_friends, container, false);
 
-
-        noFriendsMessageTextView = view.findViewById(R.id.noFriendsMessageTextView);
-        recyclerView = view.findViewById(R.id.friendsRecyclerView);
+        noFriendsMessageTextView = rootView.findViewById(R.id.noFriendsMessageTextView);
+        recyclerView = rootView.findViewById(R.id.friendsRecyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         databaseReference = FirebaseDatabase.getInstance().getReference(USERS_INFORMATION_REALTIME_DATABASE + "/");
 
         getAllFriends();
 
-        return view;
+        return rootView;
     }
 
     private void getAllFriends() {
-        databaseReference.child(firebaseUser.getUid()).child("Friends").addValueEventListener(new ValueEventListener() {
+        databaseReference.child(userUid).child("Friends").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 friendsList.clear();
@@ -152,7 +151,7 @@ public class FriendsFragment extends MainFragment {
                 usersList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
-                    if (!user.getId().equals(firebaseUser.getUid())) {
+                    if (!user.getId().equals(userUid)) {
                         if (user.getUsername().toLowerCase().contains(query.toLowerCase())) {
                             usersList.add(user);
                         }

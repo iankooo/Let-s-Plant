@@ -10,17 +10,17 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.e.letsplant.data.PostModel;
+import com.e.letsplant.data.Post;
 import com.e.letsplant.R;
 
 import java.util.ArrayList;
 
-public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class PostAdapter extends MainAdapter {
 
-    private final ArrayList<PostModel> postsDataSource;
+    private final ArrayList<Post> postsDataSource;
     private final LayoutInflater layoutInflater;
 
-    public PostAdapter(Context context, ArrayList<PostModel> postsDataSource) {
+    public PostAdapter(Context context, ArrayList<Post> postsDataSource) {
         this.postsDataSource = postsDataSource;
         this.layoutInflater = LayoutInflater.from(context);
     }
@@ -36,14 +36,6 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         String ownerName = postsDataSource.get(position).getOwnerName();
         ((PostViewHolder)holder).update(ownerName);
-
-//        ((PostViewHolder) holder).cardView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(v.getContext(),SecondActivity.class);
-//                v.getContext().startActivity(intent);
-//            }
-//        });
     }
 
     @Override

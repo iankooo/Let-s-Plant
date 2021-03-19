@@ -29,7 +29,7 @@ import java.util.Map;
 
 import dagger.multibindings.ElementsIntoSet;
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
+public class UserAdapter extends MainAdapter {
     public static final String USERS_INFORMATION_REALTIME_DATABASE = "All_Users_Information_Realtime_Database";
 
     private final Context context;
@@ -50,26 +50,26 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     @NonNull
     @Override
-    public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_user, parent, false);
         return new UserViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         User user = usersList.get(position);
         String hisUid = user.getId();
         String userProfileImage = user.getProfileImage();
         String userUsername = user.getUsername();
 
-        holder.userUsernameTextView.setText(userUsername);
+        ((UserViewHolder)holder).userUsernameTextView.setText(userUsername);
         Glide.with(context)
                 .load(userProfileImage)
-                .into(holder.userProfileImageView);
-        holder.actionTextView.setImageResource(R.drawable.ic_add_user);
-        checkIsFriend(hisUid, holder, position);
+                .into(((UserViewHolder)holder).userProfileImageView);
+        ((UserViewHolder)holder).actionTextView.setImageResource(R.drawable.ic_add_user);
+        checkIsFriend(hisUid, ((UserViewHolder)holder), position);
         //isFriendOrNot(hisUid);
-        holder.actionTextView.setOnClickListener(new View.OnClickListener() {
+        ((UserViewHolder)holder).actionTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!user.isFriend())
@@ -78,28 +78,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                     unFriend(hisUid);
             }
         });
-    }
-
-    private void isFriendOrNot(String hisUid) {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(USERS_INFORMATION_REALTIME_DATABASE);
-        databaseReference.child(hisUid).child("Friends").orderByChild("id").equalTo(userUid)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            if (dataSnapshot.exists()) {
-                                Toast.makeText(context, "You're now friends!", Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-                        }
-                        // not friends, do something
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
     }
 
     private void checkIsFriend(String hisUid, UserViewHolder holder, int position) {

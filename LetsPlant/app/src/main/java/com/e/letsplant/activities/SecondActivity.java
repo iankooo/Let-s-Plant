@@ -1,16 +1,13 @@
 package com.e.letsplant.activities;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -39,22 +36,16 @@ public class SecondActivity extends MainActivity implements PlantsFragment.OnIte
     private LinearLayout profileSettingsLinearLayout;
     private BottomSheetBehavior bottomSheetBehavior;
 
-    final Fragment plantsFragment = new PlantsFragment();
-    final Fragment friendsFragment = new FriendsFragment();
-    final Fragment profileFragment = new ProfileFragment();
-    final Fragment exploreFragment = new ExploreFragment();
-    final Fragment feedFragment = new FeedFragment();
     final FragmentManager fragmentManager = getSupportFragmentManager();
-    Fragment active = feedFragment;
-
-    FirebaseAuth fAuth;
+    Fragment activeFragment;
 
     @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(true);
         setContentView(R.layout.activity_second);
+
         this.floatingActionButton = findViewById(R.id.feedButton);
         this.profileSettingsLinearLayout = findViewById(R.id.profileSettingsLinearLayout);
         this.bottomSheetBehavior = BottomSheetBehavior.from(profileSettingsLinearLayout);
@@ -63,41 +54,56 @@ public class SecondActivity extends MainActivity implements PlantsFragment.OnIte
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation_view);
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        fragmentManager.beginTransaction().add(R.id.fragment_container, profileFragment, "5").hide(profileFragment).commit();
-        fragmentManager.beginTransaction().add(R.id.fragment_container, exploreFragment,"1").hide(exploreFragment).commit();
-        fragmentManager.beginTransaction().add(R.id.fragment_container, plantsFragment, "2").hide(plantsFragment).commit();
-        fragmentManager.beginTransaction().add(R.id.fragment_container, friendsFragment, "4").hide(friendsFragment).commit();
-        fragmentManager.beginTransaction().add(R.id.fragment_container, feedFragment, "3").commit();
+
+        Fragment feedFragment = new FeedFragment();
+        activeFragment = feedFragment;
+        fragmentManager.beginTransaction().add(R.id.fragment_container, feedFragment, "").commit();
     }
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
                 switch (item.getItemId()) {
                     case R.id.app_bar_explore:
-                        fragmentManager.beginTransaction().hide(active).show(exploreFragment).commit();
-                        active = exploreFragment;
+                        if (!(activeFragment instanceof ExploreFragment)) {
+                            Fragment exploreFragment = new ExploreFragment();
+                            fragmentManager.beginTransaction().replace(R.id.fragment_container, exploreFragment, "").commit();
+                            activeFragment = exploreFragment;
+                        }
                         return true;
 
                     case R.id.app_bar_plants:
-                        fragmentManager.beginTransaction().hide(active).show(plantsFragment).commit();
-                        active = plantsFragment;
+                        if (!(activeFragment instanceof PlantsFragment)) {
+                            Fragment plantsFragment = new PlantsFragment();
+                            fragmentManager.beginTransaction().replace(R.id.fragment_container, plantsFragment, "").commit();
+                            activeFragment = plantsFragment;
+                        }
                         return true;
 
                     case R.id.app_bar_alerts:
-                        fragmentManager.beginTransaction().hide(active).show(friendsFragment).commit();
-                        active = friendsFragment;
+                        if (!(activeFragment instanceof FriendsFragment)) {
+                            Fragment friendsFragment = new FriendsFragment();
+                            fragmentManager.beginTransaction().replace(R.id.fragment_container, friendsFragment, "").commit();
+                            activeFragment = friendsFragment;
+                        }
                         return true;
 
                     case R.id.app_bar_profile:
-                        fragmentManager.beginTransaction().hide(active).show(profileFragment).commit();
-                        active = profileFragment;
+                        if (!(activeFragment instanceof ProfileFragment)) {
+                            Fragment profileFragment = new ProfileFragment();
+                            fragmentManager.beginTransaction().replace(R.id.fragment_container, profileFragment, "").commit();
+                            activeFragment = profileFragment;
+                        }
                         return true;
                 }
                 return false;
             };
 
     public void onClickFeedButton(View view) {
-        fragmentManager.beginTransaction().hide(active).show(feedFragment).commit();
-        active = feedFragment;
+        if (!(activeFragment instanceof FeedFragment)) {
+            Fragment feedFragment = new FeedFragment();
+            fragmentManager.beginTransaction().replace(R.id.fragment_container, feedFragment, "").commit();
+            activeFragment = feedFragment;
+        }
     }
 
     @Override
@@ -109,8 +115,8 @@ public class SecondActivity extends MainActivity implements PlantsFragment.OnIte
         args.putString("image", plant.getImage());
         plantDetailedFragment.setArguments(args);
 
-        fragmentManager.beginTransaction().add(R.id.fragment_container, plantDetailedFragment, "6").hide(active).show(plantDetailedFragment).commit();
-        active = plantDetailedFragment;
+        fragmentManager.beginTransaction().replace(R.id.fragment_container, plantDetailedFragment, "").commit();
+        activeFragment = plantDetailedFragment;
     }
 
     @Override
@@ -118,23 +124,18 @@ public class SecondActivity extends MainActivity implements PlantsFragment.OnIte
         floatingActionButton.setVisibility(View.GONE);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         profileSettingsLinearLayout.setVisibility(View.VISIBLE);
+
         profileSettingsLinearLayout.findViewById(R.id.minusProfileSettingsImageView).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                } else {
-                    profileSettingsLinearLayout.setVisibility(View.GONE);
-                    floatingActionButton.setVisibility(View.VISIBLE);
-                }
+                closeActivityBottomSheet();
             }
         });
 
         profileSettingsLinearLayout.findViewById(R.id.logoutLinearLayout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fAuth.signOut();
-                startActivity(new Intent(SecondActivity.this, SignActivity.class));
+                logout();
             }
         });
 
@@ -147,6 +148,12 @@ public class SecondActivity extends MainActivity implements PlantsFragment.OnIte
                 sendBroadcast(intent);
             }
         });
+    }
+
+    public void logout() {
+        fAuth.signOut();
+        startActivity(new Intent(SecondActivity.this, SignActivity.class));
+        finish();
     }
 
     @Override

@@ -21,7 +21,7 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.util.List;
 
-public class PlantAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class PlantAdapter extends MainAdapter {
     private final List<Plant> plantList;
     Context context;
 

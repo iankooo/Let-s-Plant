@@ -26,10 +26,6 @@ import android.widget.Toast;
 import com.e.letsplant.R;
 import com.e.letsplant.data.User;
 import com.e.letsplant.data.UserViewModel;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -48,7 +44,7 @@ public class SignActivity extends MainActivity {
     private Boolean viewSignIn = true;
     private EditText username, email, password, confirmPassword;
     private ProgressBar progressBar;
-    private FirebaseAuth fAuth;
+
     private String userID;
     private final String USER_REALTIME_DATABASE = "All_Users_Information_Realtime_Database";
     private UserViewModel userViewModel;
@@ -212,21 +208,5 @@ public class SignActivity extends MainActivity {
         });
         passwordResetDialog.setNegativeButton("No", (dialog, which) -> {});
         passwordResetDialog.create().show();
-    }
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            View v = getCurrentFocus();
-            if ( v instanceof EditText) {
-                Rect outRect = new Rect();
-                v.getGlobalVisibleRect(outRect);
-                if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
-                    v.clearFocus();
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                }
-            }
-        }
-        return super.dispatchTouchEvent(event);
     }
 }
