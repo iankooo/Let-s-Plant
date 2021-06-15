@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b1ec2a2c-5427-4bb2-9570-73aa6977201f" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/LetsPlant/.idea/runConfigurations.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/activities/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/activities/MainActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/activities/SecondActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/activities/SecondActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/activities/SignActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/activities/SignActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/adapters/MainAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/adapters/MainAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/adapters/PlantAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/adapters/PlantAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/adapters/PostAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/adapters/PostAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/adapters/UserAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/adapters/UserAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/data/Plant.java" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/data/Plant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/data/Post.java" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/data/Post.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/data/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/data/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/fragments/ExploreFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/fragments/ExploreFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/fragments/FeedFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/fragments/FeedFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/fragments/FriendsFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/fragments/UsersFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/fragments/MainFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/fragments/MainFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/fragments/PlantDetailedFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/fragments/PlantDetailedFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/fragments/PlantsFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/fragments/PlantsFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/fragments/ProfileFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/java/com/e/letsplant/fragments/ProfileFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/drawable/busuioc.JPG" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/drawable/cactus.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/drawable/floarea_soarelui.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/drawable/flower.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/drawable/ic_menu.xml" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/drawable/ic_menu.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/activity_second.xml" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/activity_second.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/fragment_feed.xml" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/fragment_feed.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/fragment_friends.xml" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/fragment_users.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/fragment_plant_detailed.xml" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/fragment_plant_detailed.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/fragment_plants.xml" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/fragment_plants.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/fragment_profile.xml" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/fragment_profile.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/item_plant.xml" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/item_plant.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/item_post.xml" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/item_post.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/item_user.xml" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/layout/item_user.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/menu/bottom_app_bar_menu.xml" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/menu/bottom_app_bar_menu.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/mipmap-hdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/mipmap-hdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/mipmap-mdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/mipmap-mdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/mipmap-xhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/mipmap-xhdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/app/src/main/res/values/themes.xml" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/app/src/main/res/values/themes.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LetsPlant/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/LetsPlant/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1sIYlTwpHFMYKeBMWfF7QKtmrYP" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/LetsPlant" />
+    <property name="settings.editor.selected.configurable" value="AndroidSdkUpdater" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b1ec2a2c-5427-4bb2-9570-73aa6977201f" name="Default Changelist" comment="" />
+      <created>1620561722070</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1620561722070</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="549" y="172" key="FileChooserDialogImpl" timestamp="1623412070467">
+      <screen x="0" y="0" width="1536" height="834" />
+    </state>
+    <state x="-914" y="531" key="FileChooserDialogImpl/0.0.1536.834/-1280.379.1024.738@-1280.379.1024.738" timestamp="1622827046002" />
+    <state x="549" y="172" key="FileChooserDialogImpl/0.0.1536.834/-1280.379.1024.738@0.0.1536.834" timestamp="1620649386589" />
+    <state x="549" y="172" key="FileChooserDialogImpl/0.0.1536.834/2400.-145.1920.1170@0.0.1536.834" timestamp="1623412070467" />
+  </component>
+</project>

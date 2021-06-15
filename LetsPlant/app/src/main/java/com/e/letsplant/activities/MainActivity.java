@@ -9,10 +9,17 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.e.letsplant.App;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 
 public abstract class MainActivity extends AppCompatActivity {
-     FirebaseAuth fAuth;
+    public static final String PREFS = "PREFS";
+
+    public static final String DB_USERS = "Users";
+
+    DatabaseReference databaseReference = App.getDatabaseReference();
+    FirebaseAuth firebaseAuth = App.getFirebaseAuthReference();
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {

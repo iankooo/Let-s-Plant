@@ -6,6 +6,15 @@
     tools:context=".fragments.FeedFragment"
     android:background="#000000">
 
+    <TextView
+        android:id="@+id/noPostsMessageTextView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:text="@string/hello_feed_fragment"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/feedRecyclerView"
         android:layout_width="match_parent"

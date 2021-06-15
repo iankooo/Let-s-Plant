@@ -2,6 +2,7 @@ package com.e.letsplant.fragments;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,15 +39,13 @@ import com.e.letsplant.R;
 import com.e.letsplant.data.PlantAlertItem;
 import com.e.letsplant.listeners.RecyclerItemClickListener;
 import com.e.letsplant.data.Plant;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -60,28 +60,33 @@ import java.util.Objects;
 import static android.app.Activity.RESULT_OK;
 import static android.content.ContentValues.TAG;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link PlantsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class PlantsFragment extends MainFragment {
+    private static Fragment instance = null;
     private OnItemSelectedListener listener;
     private Uri mImageUri;
     private List<Plant> plantList;
     private RecyclerView recyclerView;
     private PlantAdapter plantAdapter;
+
+    private EditText sensorCode;
     private EditText plantNameEditText;
     private CardView cardView;
     private ImageView imageView;
 
     private ValueEventListener mDBListener;
 
+    String userUid;
+
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+
+
     public PlantsFragment() {
     }
 
-    public static PlantsFragment newInstance(String param1, String param2) {
-        return new PlantsFragment();
+    public static Fragment getInstance() {
+        if (instance == null)
+            instance = new PlantsFragment();
+        return instance;
     }
 
     @Override
@@ -100,16 +105,12 @@ public class PlantsFragment extends MainFragment {
         imageView = rootView.findViewById(R.id.imageView);
         ImageView uploadImageView = rootView.findViewById(R.id.uploadImageView);
         plantNameEditText = rootView.findViewById(R.id.plantNameEditText);
+        sensorCode = rootView.findViewById(R.id.sensorCode);
 
         recyclerView = rootView.findViewById(R.id.plantRecyclerView);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
-
-        userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        firebaseStorage = FirebaseStorage.getInstance();
-        storageReference = firebaseStorage.getReference();
-        databaseReference = FirebaseDatabase.getInstance().getReference(ALL_PLANTS_UPLOADS_DATABASE + "/" + userUid);
 
         ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage("Loading plants");
@@ -119,25 +120,9 @@ public class PlantsFragment extends MainFragment {
         plantAdapter = new PlantAdapter(getContext(), plantList);
         recyclerView.setAdapter(plantAdapter);
 
-        mDBListener = databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NotNull DataSnapshot snapshot) {
-                plantList.clear();
-                for (DataSnapshot postSnapshot : snapshot.getChildren()) {
-                    Plant plantUploadInfo = postSnapshot.getValue(Plant.class);
-                    plantUploadInfo.setKey(postSnapshot.getKey());
-                    plantList.add(plantUploadInfo);
-                }
-                plantAdapter.notifyDataSetChanged();
-                progressDialog.dismiss();
-            }
+        userUid = firebaseAuth.getUid();
 
-            @Override
-            public void onCancelled(@NotNull DatabaseError databaseError) {
-                Log.d(TAG, databaseError.getMessage());
-                progressDialog.dismiss();
-            }
-        });
+        readPlants(progressDialog);
 
         uploadImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,7 +135,7 @@ public class PlantsFragment extends MainFragment {
                 .OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                listener.onPlantItemSelected(plantList.get(position));
+                //listener.onPlantItemSelected(plantList.get(position));
             }
 
             @Override
@@ -168,16 +153,8 @@ public class PlantsFragment extends MainFragment {
                                 alert.setMessage("Delete this plant?");
                                 alert.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
-                                        Plant selectedItem = plantList.get(position);
-                                        String selectedKey = selectedItem.getKey();
-
-                                        StorageReference imageRef = firebaseStorage.getReferenceFromUrl(selectedItem.getImage());
-                                        imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                databaseReference.child(selectedKey).removeValue();
-                                            }
-                                        });
+                                        Plant plant = plantList.get(position);
+                                        databaseReference.child(DB_PLANTS).child(plant.getPlantId()).removeValue();
                                     }
                                 });
                                 alert.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -196,6 +173,28 @@ public class PlantsFragment extends MainFragment {
             }
         }));
         return rootView;
+    }
+
+    private void readPlants(ProgressDialog progressDialog) {
+        mDBListener = databaseReference.child(DB_PLANTS).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NotNull DataSnapshot snapshot) {
+                plantList.clear();
+                for (DataSnapshot postSnapshot : snapshot.getChildren()) {
+                    Plant plant = postSnapshot.getValue(Plant.class);
+                    if (plant.getOwner().equals(userUid))
+                        plantList.add(plant);
+                }
+                plantAdapter.notifyDataSetChanged();
+                progressDialog.dismiss();
+            }
+
+            @Override
+            public void onCancelled(@NotNull DatabaseError databaseError) {
+                Log.d(TAG, databaseError.getMessage());
+                progressDialog.dismiss();
+            }
+        });
     }
 
     @Override
@@ -218,11 +217,11 @@ public class PlantsFragment extends MainFragment {
                     getContext(),
                     android.R.layout.select_dialog_item,
                     android.R.id.text1,
-                    items){
+                    items) {
                 public View getView(int position, View convertView, ViewGroup parent) {
                     //Use super class to create the View
                     View v = super.getView(position, convertView, parent);
-                    TextView tv = (TextView)v.findViewById(android.R.id.text1);
+                    TextView tv = v.findViewById(android.R.id.text1);
 
                     //Put the image on the TextView
                     tv.setCompoundDrawablesWithIntrinsicBounds(items[position].icon, 0, 0, 0);
@@ -236,20 +235,21 @@ public class PlantsFragment extends MainFragment {
             };
 
             new AlertDialog.Builder(getContext())
-                .setTitle("Add new plant")
-                .setAdapter(adapter, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int item) {
-                        if (item == 0)
-                            TakeImage();
-                        if (item == 1)
-                            SelectImage();
-                    }
-                }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                })
-                .show();
+                    .setTitle("Add new plant")
+                    .setAdapter(adapter, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int item) {
+                            if (item == 0) {
+                                TakeImage();
+                            }
+                            if (item == 1)
+                                SelectImage();
+                        }
+                    }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            })
+                    .show();
 
             return true;
         }
@@ -257,6 +257,13 @@ public class PlantsFragment extends MainFragment {
     }
 
     private void TakeImage() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        try {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        } catch (ActivityNotFoundException e) {
+            // display error state to the user
+        }
+
     }
 
     @Override
@@ -269,9 +276,12 @@ public class PlantsFragment extends MainFragment {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), mImageUri);
                 plantNameEditText.setText("");
                 plantNameEditText.setFocusable(true);
+                sensorCode.setVisibility(View.VISIBLE);
+                sensorCode.setText("");
+                sensorCode.setFocusable(true);
                 imageView.setImageBitmap(bitmap);
                 cardView.setVisibility(View.VISIBLE);
-                plantNameEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                cardView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                     @Override
                     public void onFocusChange(View v, boolean hasFocus) {
                         if (!hasFocus)
@@ -282,16 +292,45 @@ public class PlantsFragment extends MainFragment {
                 e.printStackTrace();
             }
         }
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            mImageUri = data.getData();
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            imageView.setImageBitmap(imageBitmap);
+
+            plantNameEditText.setText("");
+            plantNameEditText.setFocusable(true);
+            sensorCode.setVisibility(View.VISIBLE);
+            sensorCode.setText("");
+            sensorCode.setFocusable(true);
+            imageView.setImageBitmap(imageBitmap);
+            cardView.setVisibility(View.VISIBLE);
+            cardView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if (!hasFocus)
+                        cardView.setVisibility(View.GONE);
+                }
+            });
+        }
+
     }
 
     private void uploadImage() {
+        String title = plantNameEditText.getText().toString().trim();
+        String code = sensorCode.getText().toString().trim();
+
+        if (TextUtils.isEmpty(title)) {
+            plantNameEditText.setError("Plant name is required!");
+            return;
+        }
+
         if (mImageUri != null) {
             ProgressDialog progressDialog = new ProgressDialog(getActivity());
             progressDialog.setTitle("Uploading...");
             progressDialog.show();
 
-            String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            StorageReference ref = storageReference.child(ALL_PLANT_IMAGES + "/" + userUid + System.currentTimeMillis() + "." + GetFileExtension(mImageUri));
+            StorageReference ref = storageReference.child(ALL_PLANT_IMAGES).child(userUid + System.currentTimeMillis() + "." + GetFileExtension(mImageUri));
 
             ref.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -305,13 +344,14 @@ public class PlantsFragment extends MainFragment {
                                     String imageUrl = uri.toString();
 
                                     cardView.setVisibility(View.GONE);
-                                    String tempImageName = plantNameEditText.getText().toString().trim();
 
                                     progressDialog.dismiss();
 
-                                    Plant plantUploadInfo = new Plant(tempImageName, imageUrl);
-                                    String imageUploadId = databaseReference.push().getKey();
-                                    databaseReference.child(Objects.requireNonNull(imageUploadId)).setValue(plantUploadInfo);
+                                    String plantId = databaseReference.child(DB_PLANTS).push().getKey();
+
+                                    Plant plant = new Plant(plantId, title, imageUrl, 0, -99, -1, 0, userUid, code);
+
+                                    databaseReference.child(DB_PLANTS).child(plantId).setValue(plant);
                                 }
                             });
                         }
@@ -336,7 +376,7 @@ public class PlantsFragment extends MainFragment {
     @Override
     public void onAttach(@NotNull Context context) {
         super.onAttach(context);
-        if(context instanceof OnItemSelectedListener){      // context instanceof YourActivity
+        if (context instanceof OnItemSelectedListener) {      // context instanceof YourActivity
             this.listener = (OnItemSelectedListener) context; // = (YourActivity) context
         } else {
             throw new ClassCastException(context.toString()
@@ -347,7 +387,7 @@ public class PlantsFragment extends MainFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        databaseReference.removeEventListener(mDBListener);
+        databaseReference.child(DB_PLANTS).removeEventListener(mDBListener);
     }
 
     public interface OnItemSelectedListener {

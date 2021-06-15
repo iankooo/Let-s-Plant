@@ -15,7 +15,7 @@
         <androidx.cardview.widget.CardView xmlns:cardView="http://schemas.android.com/apk/res-auto"
             android:id="@+id/cardView"
             android:layout_width="match_parent"
-            android:layout_height="90dp"
+            android:layout_height="100dp"
             android:layout_margin="8dp"
             android:visibility="gone"
             cardView:cardCornerRadius="8dp"
@@ -27,8 +27,8 @@
 
                 <ImageView
                     android:id="@+id/imageView"
-                    android:layout_width="90dp"
-                    android:layout_height="90dp"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
                     android:scaleType="centerCrop"
                     cardView:layout_constraintStart_toStartOf="parent"
                     cardView:layout_constraintTop_toTopOf="parent"
@@ -37,20 +37,37 @@
                 <EditText
                     android:id="@+id/plantNameEditText"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_margin="8dp"
-                    android:gravity="center_vertical"
-                    android:hint="@string/enter_name"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:hint="@string/plant_name"
+                    android:importantForAutofill="no"
                     android:inputType="text"
                     android:lines="1"
                     android:maxLines="1"
-                    android:padding="5dp"
+                    android:paddingHorizontal="3dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                    cardView:layout_constraintBottom_toTopOf="@id/sensorCode"
+                    cardView:layout_constraintLeft_toRightOf="@id/imageView"
+                    cardView:layout_constraintRight_toLeftOf="@id/uploadImageView"
+                    cardView:layout_constraintTop_toTopOf="parent" />
+
+                <EditText
+                    android:id="@+id/sensorCode"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_marginBottom="2dp"
+                    android:hint="Sensor code"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:paddingHorizontal="3dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     cardView:layout_constraintBottom_toBottomOf="parent"
                     cardView:layout_constraintLeft_toRightOf="@id/imageView"
-                    cardView:layout_constraintRight_toRightOf="parent"
-                    cardView:layout_constraintTop_toTopOf="parent"
-                    android:importantForAutofill="no" />
+                    cardView:layout_constraintRight_toLeftOf="@id/uploadImageView"
+                    cardView:layout_constraintTop_toBottomOf="@id/plantNameEditText" />
 
                 <ImageView
                     android:id="@+id/uploadImageView"
@@ -93,7 +110,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/cardView"
-            android:overScrollMode="never" />
+            android:overScrollMode="never"
+            android:layout_marginBottom="20dp"/>
     </RelativeLayout>
 
 </FrameLayout>

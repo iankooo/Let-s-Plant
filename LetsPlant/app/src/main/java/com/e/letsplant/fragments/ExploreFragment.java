@@ -1,61 +1,57 @@
 package com.e.letsplant.fragments;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.location.Location;
+import android.location.LocationListener;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.e.letsplant.R;
 import com.e.letsplant.data.User;
-import com.e.letsplant.data.UserViewModel;
-import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ExploreFragment extends MainFragment implements GoogleMap.OnMarkerClickListener, OnMapReadyCallback {
+public class ExploreFragment extends MainFragment implements OnMapReadyCallback, LocationListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private LatLng CURRENT_LOCATION = new LatLng(0,0);
-
-    private Marker markerCurrentLocation;
-
-    private UserViewModel userViewModel;
-    private User currentUser;
+    private static Fragment instance = null;
+    private List<String> friendsList;
+    private GoogleMap mMap;
+    String userUid;
 
     public ExploreFragment() {
     }
 
-    public static ExploreFragment newInstance(String param1, String param2) {
-        ExploreFragment fragment = new ExploreFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    public static Fragment getInstance() {
+        if (instance == null)
+            instance = new ExploreFragment();
+        return instance;
     }
 
     @Override
@@ -67,75 +63,160 @@ public class ExploreFragment extends MainFragment implements GoogleMap.OnMarkerC
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_explore, null, false);
-        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
-        currentUser = userViewModel.getUserMutableLiveData().getValue();
-        if (currentUser != null)
-            CURRENT_LOCATION = new LatLng(currentUser.getLatitude(), currentUser.getLongitude());
+        rootView = inflater.inflate(R.layout.fragment_explore, container, false);
 
-        SupportMapFragment mapFragment =
-                (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
 
         return rootView;
     }
 
     @Override
-    public void onMapReady(GoogleMap map) {
-        if (currentUser != null)
-            markerCurrentLocation = map.addMarker(new MarkerOptions()
-                    .position(CURRENT_LOCATION)
-                    .icon(bitmapDescriptorFromVector(getActivity()))
-                    .title(currentUser.getUsername())
-                    .snippet(currentUser.getPhone())
-            );
-        else
-            markerCurrentLocation = map.addMarker(new MarkerOptions()
-                    .position(CURRENT_LOCATION)
-                    .icon(bitmapDescriptorFromVector(getActivity()))
-            );
-        markerCurrentLocation.setTag(0);
+    public void onLocationChanged(@NonNull Location location) {
 
-        List<Marker> markers = new ArrayList<>();
-        markers.add(markerCurrentLocation);
-
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for (Marker m : markers) {
-            builder.include(m.getPosition());
-        }
-        LatLngBounds bounds = builder.build();
-
-        map.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-            @Override
-            public void onMapLoaded() {
-                int padding = 0;
-                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-                map.animateCamera(cu);
-            }
-        });
-        map.setOnMarkerClickListener(this);
-    }
-    private BitmapDescriptor bitmapDescriptorFromVector(Context context) {
-        Drawable vectorDrawable = ContextCompat.getDrawable(context, R.drawable.ic_pin);
-        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
-        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        vectorDrawable.draw(canvas);
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
     @Override
-    public boolean onMarkerClick(final Marker marker) {
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
         Integer clickCount = (Integer) marker.getTag();
 
-        if (clickCount != null) {
-            clickCount = clickCount + 1;
-            marker.setTag(clickCount);
-            Toast.makeText(getContext(),
-                    marker.getTitle() +
-                            " has been clicked " + clickCount + " times.",
-                    Toast.LENGTH_SHORT).show();
+        if (clickCount == null)
+            return false;
+
+        if (clickCount == 0) {
+            clickCount = 1;
+        } else {
+            clickCount = 0;
         }
+        marker.setTag(clickCount);
         return false;
+    }
+
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        try {
+            boolean success = googleMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.places_keep));
+            if (!success) {
+                Log.e("map_style", "map style updated please do check it");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e("map_style", "map is not updated yet ... do some other stuff");
+        }
+
+        mMap = googleMap;
+        googleMap.setOnMarkerClickListener(this);
+        googleMap.setMapType(R.raw.places_keep);
+        googleMap.setOnInfoWindowClickListener(this);
+
+
+        databaseReference.child(DB_USERS).child(userUid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                //String userUid = Objects.requireNonNull(firebaseAuth.getCurrentUser()).getUid();
+                User currentUser = snapshot.getValue(User.class);
+
+                checkFriends();
+
+                LatLng location = new LatLng(currentUser.getLatitude(), currentUser.getLongitude());
+                Marker marker = mMap.addMarker(new MarkerOptions()
+                        .position(location)
+                        .title(currentUser.getUsername())
+                        .snippet(currentUser.getPhone())
+                );
+                marker.setTag(0);
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 13));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void checkFriends() {
+        friendsList = new ArrayList<>();
+
+        databaseReference.child("Follow").child(userUid).child("friends").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                friendsList.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    friendsList.add(dataSnapshot.getKey());
+                }
+                readFriendsLocations();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void readFriendsLocations() {
+        databaseReference.child("Users").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    User user = dataSnapshot.getValue(User.class);
+
+                    for (String id : friendsList)
+                        if (user.getId().equals(id)) {
+                            LatLng location = new LatLng(user.getLatitude(), user.getLongitude());
+                            Marker marker = mMap.addMarker(new MarkerOptions()
+                                    .position(location)
+                                    .title(user.getUsername())
+                                    .snippet(user.getPhone())
+                            );
+                            marker.setTag(0);
+                        }
+                    //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 13));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+//    private BitmapDescriptor bitmapDescriptorFromVector(Context context) {
+//        Drawable vectorDrawable = ContextCompat.getDrawable(context, R.drawable.ic_pin);
+//        Objects.requireNonNull(vectorDrawable).setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+//        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+//        Canvas canvas = new Canvas(bitmap);
+//        vectorDrawable.draw(canvas);
+//        return BitmapDescriptorFactory.fromBitmap(bitmap);
+//    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        String telephone = "tel:" + marker.getSnippet();
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse(telephone));
+        startActivity(intent);
     }
 }

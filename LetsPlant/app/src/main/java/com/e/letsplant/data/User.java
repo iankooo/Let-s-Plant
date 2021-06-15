@@ -1,9 +1,8 @@
 package com.e.letsplant.data;
 
 import com.google.firebase.database.Exclude;
-import java.util.ArrayList;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class User {
@@ -15,9 +14,6 @@ public class User {
     private String phone;
     private String profileImage = "";
     private String username;
-    private List<User> friends = new ArrayList<>();
-
-    private boolean isFriend = false;
 
     public User() {
     }
@@ -95,14 +91,6 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public boolean isFriend() {
-        return isFriend;
-    }
-
-    public void setFriend(boolean isFriend) {
-        this.isFriend = isFriend;
     }
 
     @Exclude

@@ -16,7 +16,7 @@
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="56dp"/>
+            android:layout_marginBottom="56dp" />
 
         <com.google.android.material.bottomappbar.BottomAppBar
             android:id="@+id/bottom_app_bar"
@@ -32,9 +32,9 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="0dp"
                 android:layout_marginEnd="0dp"
-                app:backgroundTint="@color/black"
                 android:clickable="true"
                 android:focusable="true"
+                app:backgroundTint="@color/black"
                 app:itemIconTint="#808080"
                 app:itemTextColor="#808080"
                 app:labelVisibilityMode="labeled"
@@ -47,14 +47,15 @@
             android:layout_width="wrap_content"
             android:layout_height="94dp"
             android:backgroundTint="@android:color/black"
-            android:src="@drawable/ic_plant"
-            app:layout_anchor="@id/bottom_app_bar"
             android:clickable="true"
+            android:focusable="true"
             android:onClick="onClickFeedButton"
-            android:focusable="true" />
+            android:src="@drawable/ic_plant"
+            app:layout_anchor="@id/bottom_app_bar" />
 
-        <include layout="@layout/fragment_profile_settings"
-            android:visibility="gone"/>
+        <include
+            layout="@layout/fragment_profile_settings"
+            android:visibility="gone" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

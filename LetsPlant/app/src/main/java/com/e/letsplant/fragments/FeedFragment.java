@@ -1,37 +1,48 @@
 package com.e.letsplant.fragments;
 
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
 import com.e.letsplant.adapters.PostAdapter;
 import com.e.letsplant.data.Post;
 import com.e.letsplant.R;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FeedFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class FeedFragment extends MainFragment {
+    private static Fragment instance = null;
+    private TextView noPostsMessageTextView;
 
-    private ArrayList<Post> postsDataSource;
-    private LinearLayoutManager linearLayoutManager;
+    private List<Post> posts;
     private RecyclerView recyclerView;
     private PostAdapter postAdapter;
 
-    public FeedFragment() {
+    private List<String> friendsList;
 
+    String userUid;
+
+    public FeedFragment() {
     }
 
-    public static FeedFragment newInstance(String param1, String param2) {
-        return new FeedFragment();
+    public static Fragment getInstance() {
+        if (instance == null)
+            instance = new FeedFragment();
+        return instance;
     }
 
     @Override
@@ -45,46 +56,72 @@ public class FeedFragment extends MainFragment {
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_feed, container, false);
 
-        postsDataSource = new ArrayList<>();
-        postsDataSource.add(new Post("Name1"));
-        postsDataSource.add(new Post("Name2"));
-        postsDataSource.add(new Post("Name3"));
-        postsDataSource.add(new Post("Name4"));
-        postsDataSource.add(new Post("Name5"));
-        postsDataSource.add(new Post("Name6"));
-        postsDataSource.add(new Post("Name7"));
-        postsDataSource.add(new Post("Name8"));
-        postsDataSource.add(new Post("Name9"));
-        postsDataSource.add(new Post("Name10"));
-        postsDataSource.add(new Post("Name11"));
-        postsDataSource.add(new Post("Name12"));
-        postsDataSource.add(new Post("Name13"));
-        postsDataSource.add(new Post("Name14"));
-        postsDataSource.add(new Post("Name15"));
-        postsDataSource.add(new Post("Name16"));
-        postsDataSource.add(new Post("Name17"));
-        postsDataSource.add(new Post("Name18"));
-        postsDataSource.add(new Post("Name19"));
-        postsDataSource.add(new Post("Name20"));
-        postsDataSource.add(new Post("Name21"));
-        postsDataSource.add(new Post("Name22"));
-        postsDataSource.add(new Post("Name23"));
-        postsDataSource.add(new Post("Name24"));
-        postsDataSource.add(new Post("Name25"));
-        postsDataSource.add(new Post("Name26"));
-        postsDataSource.add(new Post("Name27"));
-        postsDataSource.add(new Post("Name28"));
-        postsDataSource.add(new Post("Name29"));
-        postsDataSource.add(new Post("Name30"));
-        postsDataSource.add(new Post("Name31"));
-        postsDataSource.add(new Post("Name32"));
-        linearLayoutManager = new LinearLayoutManager(getActivity());
+        userUid = firebaseAuth.getUid();
+        posts = new ArrayList<>();
+
+        noPostsMessageTextView = rootView.findViewById(R.id.noPostsMessageTextView);
         recyclerView = rootView.findViewById(R.id.feedRecyclerView);
-        postAdapter = new PostAdapter(getActivity(), postsDataSource);
+        recyclerView.setHasFixedSize(true);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
 
         recyclerView.setLayoutManager(linearLayoutManager);
+
+        postAdapter = new PostAdapter(getContext(), posts);
         recyclerView.setAdapter(postAdapter);
 
+        checkFriends();
+
         return rootView;
+    }
+
+    private void checkFriends() {
+        friendsList = new ArrayList<>();
+
+        databaseReference.child(DB_FOLLOW).child(userUid).child("friends").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                friendsList.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    friendsList.add(dataSnapshot.getKey());
+                }
+                readPosts();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void readPosts() {
+        databaseReference.child(DB_POSTS).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                posts.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Post post = dataSnapshot.getValue(Post.class);
+                    for (String id : friendsList)
+                        if (post.getPublisher().equals(id)) {
+                            posts.add(post);
+                        }
+                }
+                postAdapter.notifyDataSetChanged();
+
+                if (posts.size() == 0) {
+                    noPostsMessageTextView.setVisibility(View.VISIBLE);
+                } else {
+                    noPostsMessageTextView.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

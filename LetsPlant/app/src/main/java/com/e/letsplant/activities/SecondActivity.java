@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentManager;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -16,7 +17,7 @@ import android.widget.LinearLayout;
 
 import com.e.letsplant.R;
 import com.e.letsplant.data.Plant;
-import com.e.letsplant.fragments.FriendsFragment;
+import com.e.letsplant.fragments.UsersFragment;
 import com.e.letsplant.fragments.ExploreFragment;
 import com.e.letsplant.fragments.FeedFragment;
 import com.e.letsplant.fragments.PlantDetailedFragment;
@@ -36,87 +37,73 @@ public class SecondActivity extends MainActivity implements PlantsFragment.OnIte
     private LinearLayout profileSettingsLinearLayout;
     private BottomSheetBehavior bottomSheetBehavior;
 
-    final FragmentManager fragmentManager = getSupportFragmentManager();
-    Fragment activeFragment;
+    private Fragment fragment = null;
+    private final FragmentManager fragmentManager = getSupportFragmentManager();
 
-    @SuppressLint("NonConstantResourceId")
+    String userUid;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(true);
         setContentView(R.layout.activity_second);
 
+        userUid = firebaseAuth.getUid();
+
         this.floatingActionButton = findViewById(R.id.feedButton);
         this.profileSettingsLinearLayout = findViewById(R.id.profileSettingsLinearLayout);
         this.bottomSheetBehavior = BottomSheetBehavior.from(profileSettingsLinearLayout);
 
-        fAuth = FirebaseAuth.getInstance();
-
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation_view);
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        Fragment feedFragment = new FeedFragment();
-        activeFragment = feedFragment;
-        fragmentManager.beginTransaction().add(R.id.fragment_container, feedFragment, "").commit();
+        fragment = FeedFragment.getInstance();
+        fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment, "").commit();
     }
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+    @SuppressLint("NonConstantResourceId")
+    private final BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
-                switch (item.getItemId()) {
-                    case R.id.app_bar_explore:
-                        if (!(activeFragment instanceof ExploreFragment)) {
-                            Fragment exploreFragment = new ExploreFragment();
-                            fragmentManager.beginTransaction().replace(R.id.fragment_container, exploreFragment, "").commit();
-                            activeFragment = exploreFragment;
-                        }
-                        return true;
+        switch (item.getItemId()) {
+            case R.id.app_bar_explore:
+                fragment = ExploreFragment.getInstance();
+                break;
 
-                    case R.id.app_bar_plants:
-                        if (!(activeFragment instanceof PlantsFragment)) {
-                            Fragment plantsFragment = new PlantsFragment();
-                            fragmentManager.beginTransaction().replace(R.id.fragment_container, plantsFragment, "").commit();
-                            activeFragment = plantsFragment;
-                        }
-                        return true;
+            case R.id.app_bar_plants:
+                fragment = PlantsFragment.getInstance();
+                break;
 
-                    case R.id.app_bar_alerts:
-                        if (!(activeFragment instanceof FriendsFragment)) {
-                            Fragment friendsFragment = new FriendsFragment();
-                            fragmentManager.beginTransaction().replace(R.id.fragment_container, friendsFragment, "").commit();
-                            activeFragment = friendsFragment;
-                        }
-                        return true;
+            case R.id.app_bar_alerts:
+                fragment = UsersFragment.getInstance();
+                break;
 
-                    case R.id.app_bar_profile:
-                        if (!(activeFragment instanceof ProfileFragment)) {
-                            Fragment profileFragment = new ProfileFragment();
-                            fragmentManager.beginTransaction().replace(R.id.fragment_container, profileFragment, "").commit();
-                            activeFragment = profileFragment;
-                        }
-                        return true;
-                }
-                return false;
-            };
+            case R.id.app_bar_profile:
+                SharedPreferences.Editor editor = getSharedPreferences(PREFS, MODE_PRIVATE).edit();
+                editor.putString("profileId", userUid);
+                editor.apply();
+                fragment = ProfileFragment.getInstance();
+                break;
+        }
+        if (fragment != null)
+            fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment, "").commit();
+        return true;
+    };
 
     public void onClickFeedButton(View view) {
-        if (!(activeFragment instanceof FeedFragment)) {
-            Fragment feedFragment = new FeedFragment();
-            fragmentManager.beginTransaction().replace(R.id.fragment_container, feedFragment, "").commit();
-            activeFragment = feedFragment;
-        }
+        fragment = FeedFragment.getInstance();
+        fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment, "").commit();
     }
 
     @Override
     public void onPlantItemSelected(Plant plant) {
-        Fragment plantDetailedFragment = new PlantDetailedFragment();
+        fragment = PlantDetailedFragment.getInstance();
 
         Bundle args = new Bundle();
         args.putString("title", plant.getTitle());
         args.putString("image", plant.getImage());
-        plantDetailedFragment.setArguments(args);
+        fragment.setArguments(args);
 
-        fragmentManager.beginTransaction().replace(R.id.fragment_container, plantDetailedFragment, "").commit();
-        activeFragment = plantDetailedFragment;
+        fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment, "").commit();
     }
 
     @Override
@@ -151,7 +138,12 @@ public class SecondActivity extends MainActivity implements PlantsFragment.OnIte
     }
 
     public void logout() {
-        fAuth.signOut();
+        SharedPreferences preferences = getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.apply();
+
+        firebaseAuth.signOut();
         startActivity(new Intent(SecondActivity.this, SignActivity.class));
         finish();
     }

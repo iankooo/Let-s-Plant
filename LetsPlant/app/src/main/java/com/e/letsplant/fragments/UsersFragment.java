@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuItemCompat;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,18 +18,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.e.letsplant.App;
 import com.e.letsplant.R;
 import com.e.letsplant.adapters.UserAdapter;
 import com.e.letsplant.data.User;
-import com.e.letsplant.listeners.RecyclerItemClickListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -37,20 +35,36 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class FriendsFragment extends MainFragment {
+public class UsersFragment extends MainFragment {
+    private static Fragment instance = null;
+    private List<User> mUsers;
 
-    private final List<User> usersList = new ArrayList<>();
-    private final List<User> friendsList = new ArrayList<>();
-
-    private TextView noFriendsMessageTextView;
+    private TextView noUsersMessageTextView;
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
 
-    public FriendsFragment() {
+    private String userUid;
+    private String userId;
+
+    FirebaseAuth auth = App.getFirebaseAuthReference();
+    FirebaseAuth.AuthStateListener authListener = new FirebaseAuth.AuthStateListener() {
+        @Override
+        public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+            FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+            if (firebaseUser != null) {
+                userId = firebaseUser.getUid();
+                String userEmail = firebaseUser.getEmail();
+            }
+        }
+    };
+
+    public UsersFragment() {
     }
 
-    public static FriendsFragment newInstance(String param1, String param2) {
-        return new FriendsFragment();
+    public static Fragment getInstance() {
+        if (instance == null)
+            instance = new UsersFragment();
+        return instance;
     }
 
     @Override
@@ -63,46 +77,23 @@ public class FriendsFragment extends MainFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_friends, container, false);
+        if (firebaseAuth.getCurrentUser() != null)
+            userUid = firebaseAuth.getCurrentUser().getUid();
+        rootView = inflater.inflate(R.layout.fragment_users, container, false);
 
-        noFriendsMessageTextView = rootView.findViewById(R.id.noFriendsMessageTextView);
+        noUsersMessageTextView = rootView.findViewById(R.id.noFriendsMessageTextView);
+
         recyclerView = rootView.findViewById(R.id.friendsRecyclerView);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        databaseReference = FirebaseDatabase.getInstance().getReference(USERS_INFORMATION_REALTIME_DATABASE + "/");
+        mUsers = new ArrayList<>();
+        userAdapter = new UserAdapter(getContext(), mUsers);
+        recyclerView.setAdapter(userAdapter);
 
-        getAllFriends();
+        getAllUsers();
 
         return rootView;
-    }
-
-    private void getAllFriends() {
-        databaseReference.child(userUid).child("Friends").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                friendsList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    User user = dataSnapshot.getValue(User.class);
-                    friendsList.add(user);
-
-                    userAdapter = new UserAdapter(getActivity(), friendsList);
-                    recyclerView.setAdapter(userAdapter);
-                }
-                if (friendsList.size() == 0){
-                    noFriendsMessageTextView.setVisibility(View.VISIBLE);
-                }
-                else {
-                    noFriendsMessageTextView.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
     }
 
     @Override
@@ -116,7 +107,7 @@ public class FriendsFragment extends MainFragment {
                 if (!TextUtils.isEmpty(s.trim()) && !s.equals("")) {
                     searchUsers(s);
                 } else {
-                    getAllFriends();
+                    getAllUsers();
                 }
                 return false;
             }
@@ -126,7 +117,7 @@ public class FriendsFragment extends MainFragment {
                 if (!TextUtils.isEmpty(s.trim()) && !s.equals("")) {
                     searchUsers(s);
                 } else {
-                    getAllFriends();
+                    getAllUsers();
                 }
                 return false;
             }
@@ -145,20 +136,48 @@ public class FriendsFragment extends MainFragment {
     }
 
     private void searchUsers(String query) {
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseReference.child(DB_USERS).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                usersList.clear();
+                mUsers.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
                     if (!user.getId().equals(userUid)) {
                         if (user.getUsername().toLowerCase().contains(query.toLowerCase())) {
-                            usersList.add(user);
+                            mUsers.add(user);
                         }
                     }
-                    userAdapter = new UserAdapter(getActivity(), usersList);
-                    userAdapter.notifyDataSetChanged();
-                    recyclerView.setAdapter(userAdapter);
+                }
+                userAdapter.updateDataSet(mUsers);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getAllUsers() {
+        databaseReference.child(DB_USERS).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                mUsers.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    User user = dataSnapshot.getValue(User.class);
+                    if (firebaseAuth.getCurrentUser() != null) {
+                        if (!user.getId().equals(userUid)) {
+                            mUsers.add(user);
+                        }
+                    }
+                }
+
+                userAdapter.updateDataSet(mUsers);
+
+                if (mUsers.size() == 0) {
+                    noUsersMessageTextView.setVisibility(View.VISIBLE);
+                } else {
+                    noUsersMessageTextView.setVisibility(View.GONE);
                 }
             }
 

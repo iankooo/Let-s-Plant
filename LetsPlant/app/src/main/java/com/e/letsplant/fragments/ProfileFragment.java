@@ -6,13 +6,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -23,15 +27,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.e.letsplant.R;
+import com.e.letsplant.adapters.MyPhotosAdapter;
+import com.e.letsplant.data.Post;
 import com.e.letsplant.data.User;
-import com.e.letsplant.data.UserViewModel;
 import com.e.letsplant.interfaces.ProfileSettingsEventListener;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -43,24 +50,18 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -69,22 +70,34 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.ContentValues.TAG;
 
 public class ProfileFragment extends MainFragment {
+    private static Fragment instance = null;
     private ProfileSettingsEventListener profileSettingsEventListener;
     private boolean isProfileSettingsOpen = false;
 
-    private TextView titleFragmentProfileTextView;
-    private ImageView profileImage;
-    private EditText email;
-    private EditText username;
-    private EditText phone;
-    private EditText location;
+    private TextView posts, friends;
+    private ImageView image_profile;
+    private Button edit_profile;
+    private EditText email, username, phone, location;
+    private ImageButton my_photos, saved_photos;
+
+    RecyclerView recyclerView_posts;
+    MyPhotosAdapter myPhotosAdapter;
+    List<Post> postList;
+
+    List<String> mySaves;
+    RecyclerView recyclerView_saves;
+    MyPhotosAdapter myPhotosAdapter_saves;
+    List<Post> postList_saves;
+
     private Menu menu;
     private Uri filePath;
 
-    private UserViewModel userViewModel;
-
     private double latitude = 0;
     private double longitude = 0;
+
+    String profileId;
+
+    String userUid;
 
     BroadcastReceiver receiverUpdateDownload = new BroadcastReceiver() {
         @Override
@@ -102,11 +115,10 @@ public class ProfileFragment extends MainFragment {
     public ProfileFragment() {
     }
 
-    public static ProfileFragment newInstance(String param1, String param2) {
-        ProfileFragment fragment = new ProfileFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
+    public static Fragment getInstance() {
+        if (instance == null)
+            instance = new ProfileFragment();
+        return instance;
     }
 
     @Override
@@ -120,47 +132,123 @@ public class ProfileFragment extends MainFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        titleFragmentProfileTextView = rootView.findViewById(R.id.titleFragmentProfileTextView);
-        profileImage = rootView.findViewById(R.id.profileImageView);
+        userUid = firebaseAuth.getUid();
+
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("PREFS", Context.MODE_PRIVATE);
+        profileId = sharedPreferences.getString("profileId", "none");
+
+        edit_profile = rootView.findViewById(R.id.edit_profile);
+        posts = rootView.findViewById(R.id.posts);
+        friends = rootView.findViewById(R.id.friends);
+        image_profile = rootView.findViewById(R.id.profileImageView);
         email = rootView.findViewById(R.id.emailEditText);
         username = rootView.findViewById(R.id.usernameEditText);
         phone = rootView.findViewById(R.id.phoneEditText);
         location = rootView.findViewById(R.id.locationEditText);
+        my_photos = rootView.findViewById(R.id.my_photos);
+        saved_photos = rootView.findViewById(R.id.saved_photos);
 
+        recyclerView_posts = rootView.findViewById(R.id.recycler_view_photos);
+        recyclerView_posts.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new GridLayoutManager(getContext(), 2);
+        recyclerView_posts.setLayoutManager(linearLayoutManager);
+        postList = new ArrayList<>();
+        myPhotosAdapter = new MyPhotosAdapter(getContext(), postList);
+        recyclerView_posts.setAdapter(myPhotosAdapter);
+
+        recyclerView_saves = rootView.findViewById(R.id.recycler_view_saved_photos);
+        recyclerView_saves.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager_saves = new GridLayoutManager(getContext(), 2);
+        recyclerView_saves.setLayoutManager(linearLayoutManager_saves);
+        postList_saves = new ArrayList<>();
+        myPhotosAdapter_saves = new MyPhotosAdapter(getContext(), postList_saves);
+        recyclerView_saves.setAdapter(myPhotosAdapter_saves);
+
+        recyclerView_posts.setVisibility(View.VISIBLE);
+        recyclerView_saves.setVisibility(View.GONE);
+
+        userInfo();
         initialize(false);
 
-        userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        storageReference = FirebaseStorage.getInstance().getReference();
-        databaseReference = FirebaseDatabase.getInstance().getReference(USERS_INFORMATION_REALTIME_DATABASE + "/" + userUid);
 
+        getFriends();
+        getNrPosts();
+        getPhotos();
+        getSaves();
+
+        if (profileId.equals(userUid)) {
+            edit_profile.setVisibility(View.GONE);
+        } else {
+            edit_profile.setVisibility(View.VISIBLE);
+            checkFriend();
+            saved_photos.setVisibility(View.GONE);
+        }
+
+        edit_profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String btn = edit_profile.getText().toString();
+
+                switch (btn) {
+                    case "edit profile":
+                        // go to Edit Profile
+                        break;
+                    case "add friend":
+                        databaseReference.child("Follow").child(userUid).child("friends").child(profileId).setValue(true);
+                        break;
+                    case "unfriend":
+                        databaseReference.child("Follow").child(userUid).child("friends").child(profileId).removeValue();
+                        break;
+                }
+            }
+        });
+
+        my_photos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recyclerView_posts.setVisibility(View.VISIBLE);
+                recyclerView_saves.setVisibility(View.GONE);
+            }
+        });
+        saved_photos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recyclerView_posts.setVisibility(View.GONE);
+                recyclerView_saves.setVisibility(View.VISIBLE);
+            }
+        });
+
+        IntentFilter filter = new IntentFilter("openEditProfileSettings");
+        getActivity().registerReceiver(receiverUpdateDownload, filter);
+
+        return rootView;
+    }
+
+    private void userInfo() {
         ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage("Loading profile");
         progressDialog.show();
 
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseReference.child(DB_USERS).child(profileId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (getContext() == null) {
+                    return;
+                }
                 currentUserInfo = snapshot.getValue(User.class);
                 if (currentUserInfo == null) {
                     Log.e(TAG, "User data is null");
                     progressDialog.dismiss();
                     return;
                 }
-                if (!currentUserInfo.getProfileImage().equals("null") && !currentUserInfo.getProfileImage().equals("")) {
-                    Glide.with(getContext())
-                            .load(currentUserInfo.getProfileImage())
-                            .into(profileImage);
-                } else {
-                    profileImage.setImageResource(R.drawable.ic_user_rounded);
-                }
+                Glide.with(getContext()).load(currentUserInfo.getProfileImage()).into(image_profile);
+                filePath = Uri.parse(currentUserInfo.getProfileImage());
                 email.setText(currentUserInfo.getEmail());
                 username.setText(currentUserInfo.getUsername());
                 phone.setText(currentUserInfo.getPhone());
                 location.setText(currentUserInfo.getLocation());
-
-                userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
-                userViewModel.setUserMutableLiveData(currentUserInfo);
-
+                longitude = currentUserInfo.getLongitude();
+                latitude = currentUserInfo.getLatitude();
                 progressDialog.dismiss();
             }
 
@@ -169,11 +257,57 @@ public class ProfileFragment extends MainFragment {
                 Log.w(TAG, "loadUser:onCancelled", error.toException());
             }
         });
+    }
 
-        IntentFilter filter = new IntentFilter("openEditProfileSettings");
-        getActivity().registerReceiver(receiverUpdateDownload, filter);
+    private void checkFriend() {
+        databaseReference.child(DB_FOLLOW).child(userUid).child("friends").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.child(profileId).exists())
+                    edit_profile.setText("unfriend");
+                else
+                    edit_profile.setText("add friend");
+            }
 
-        return rootView;
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getFriends() {
+        databaseReference.child(DB_FOLLOW).child(profileId).child("friends").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                friends.setText("" + snapshot.getChildrenCount());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getNrPosts() {
+        databaseReference.child(DB_POSTS).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int i = 0;
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Post post = dataSnapshot.getValue(Post.class);
+                    if (Objects.requireNonNull(post).getPublisher().equals(profileId))
+                        i++;
+                }
+                posts.setText("" + i);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void initialize(boolean value) {
@@ -205,29 +339,27 @@ public class ProfileFragment extends MainFragment {
         location.setSelected(value);
 
         if (!value) {
-            titleFragmentProfileTextView.setText("Profile");
-            if (!currentUserInfo.getProfileImage().equals("null") && !currentUserInfo.getProfileImage().equals("")) {
-                Glide.with(getContext())
-                        .load(currentUserInfo.getProfileImage())
-                        .into(profileImage);
-            } else {
-                profileImage.setImageResource(R.drawable.ic_user_rounded);
-            }
+//            if (!currentUserInfo.getProfileImage().equals("null") && !currentUserInfo.getProfileImage().equals("")) {
+//                Glide.with(getContext())
+//                        .load(currentUserInfo.getProfileImage())
+//                        .into(image_profile);
+//            } else {
+//                image_profile.setImageResource(R.drawable.ic_user_rounded);
+//            }
             email.setBackgroundResource(android.R.color.transparent);
             username.setBackgroundResource(android.R.color.transparent);
             phone.setBackgroundResource(android.R.color.transparent);
             location.setBackgroundResource(android.R.color.transparent);
-            profileImage.setOnClickListener(null);
+            image_profile.setOnClickListener(null);
         } else {
-            titleFragmentProfileTextView.setText("Tap to change");
             email.setBackgroundResource(android.R.drawable.edit_text);
             username.setBackgroundResource(android.R.drawable.edit_text);
             phone.setBackgroundResource(android.R.drawable.edit_text);
             location.setBackgroundResource(android.R.drawable.edit_text);
 
-            profileImage.setOnClickListener(v -> SelectImage());
+            image_profile.setOnClickListener(v -> SelectImage());
 
-            Places.initialize(getContext(), "");
+            Places.initialize(getContext(), "AIzaSyAYJE72q4PNe5oH5GbT2OHV186UO3t30qo");
             location.setFocusable(false);
             location.setOnClickListener(v -> {
                 List<Place.Field> fieldList = Arrays.asList(Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.NAME);
@@ -307,12 +439,9 @@ public class ProfileFragment extends MainFragment {
 
         User user = new User(userUid, email, location, latitude, longitude, phone, profileImage, username);
 
-        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
-        userViewModel.setUserMutableLiveData(user);
-
         Map<String, Object> userValues = user.toMap();
 
-        databaseReference.updateChildren(userValues).addOnCompleteListener(new OnCompleteListener<Void>() {
+        databaseReference.child(DB_USERS).child(userUid).updateChildren(userValues).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
@@ -322,7 +451,7 @@ public class ProfileFragment extends MainFragment {
                 }
             }
         });
-        if (!profileImage.equals("")) {
+        if (!profileImage.equals("") && !profileImage.contains("https")) {
             uploadImage();
         }
         initialize(false);
@@ -336,7 +465,7 @@ public class ProfileFragment extends MainFragment {
             filePath = data.getData();
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
-                profileImage.setImageBitmap(bitmap);
+                image_profile.setImageBitmap(bitmap);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -346,6 +475,7 @@ public class ProfileFragment extends MainFragment {
             location.setText(place.getAddress());
             latitude = place.getLatLng().latitude;
             longitude = place.getLatLng().longitude;
+
         } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
             Status status = Autocomplete.getStatusFromIntent(data);
             Toast.makeText(getContext(), status.getStatusMessage(), Toast.LENGTH_SHORT).show();
@@ -358,7 +488,7 @@ public class ProfileFragment extends MainFragment {
             progressDialog.setMessage("Updating...");
             progressDialog.show();
 
-            StorageReference ref = storageReference.child(ALL_USER_PROFILE_IMAGES + "/" + userUid + "." + GetFileExtension(filePath));
+            StorageReference ref = storageReference.child(ALL_USER_PROFILE_IMAGES).child(userUid + "." + GetFileExtension(filePath));
 
             ref.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -371,7 +501,7 @@ public class ProfileFragment extends MainFragment {
                                 public void onSuccess(Uri uri) {
                                     String imageUrl = uri.toString();
                                     progressDialog.dismiss();
-                                    databaseReference.child("profileImage").setValue(imageUrl);
+                                    databaseReference.child(DB_USERS).child(userUid).child("profileImage").setValue(imageUrl);
                                 }
                             });
                         }
@@ -385,5 +515,66 @@ public class ProfileFragment extends MainFragment {
                 }
             });
         }
+    }
+
+    private void getPhotos() {
+        databaseReference.child(DB_POSTS).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                postList.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Post post = dataSnapshot.getValue(Post.class);
+                    if (post.getPublisher().equals(profileId))
+                        postList.add(post);
+                }
+                Collections.reverse(postList);
+                myPhotosAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getSaves() {
+        mySaves = new ArrayList<>();
+        databaseReference.child(DB_SAVES).child(userUid).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    mySaves.add(dataSnapshot.getKey());
+                }
+                readSaves();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void readSaves() {
+        databaseReference.child(DB_POSTS).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                postList_saves.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Post post = dataSnapshot.getValue(Post.class);
+
+                    for (String id : mySaves)
+                        if (post.getPostId().equals(id))
+                            postList_saves.add(post);
+                }
+                myPhotosAdapter_saves.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

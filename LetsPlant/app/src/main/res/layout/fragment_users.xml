@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.FriendsFragment">
+    tools:context=".fragments.UsersFragment">
 
     <TextView
         android:id="@+id/noFriendsMessageTextView"
@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="@string/hello_friends_fragment"/>
+        android:text="@string/hello_users_fragment"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/friendsRecyclerView"
