@@ -1,7 +1,5 @@
 package com.e.letsplant.data;
 
-import com.google.firebase.database.Exclude;
-
 public class Plant {
 
     private String plantId;
@@ -100,15 +98,5 @@ public class Plant {
     public void setCode(String code) {
         this.code = code;
     }
-
-//    @Exclude
-//    public String getKey() {
-//        return key;
-//    }
-//
-//    @Exclude
-//    public void setKey(String key) {
-//        this.key = key;
-//    }
 
 }

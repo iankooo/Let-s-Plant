@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class MyPhotosAdapter extends MainAdapter {
     private final Context context;
@@ -132,7 +133,7 @@ public class MyPhotosAdapter extends MainAdapter {
         databaseReference.child("Posts").child(postId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                editText.setText(snapshot.getValue(Post.class).getDescription());
+                editText.setText(Objects.requireNonNull(snapshot.getValue(Post.class)).getDescription());
             }
 
             @Override

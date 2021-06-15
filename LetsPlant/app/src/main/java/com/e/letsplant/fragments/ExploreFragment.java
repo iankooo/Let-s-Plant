@@ -6,16 +6,15 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.e.letsplant.R;
 import com.e.letsplant.data.User;
@@ -192,7 +191,6 @@ public class ExploreFragment extends MainFragment implements OnMapReadyCallback,
                             );
                             marker.setTag(0);
                         }
-                    //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 13));
                 }
             }
 
@@ -202,15 +200,6 @@ public class ExploreFragment extends MainFragment implements OnMapReadyCallback,
             }
         });
     }
-
-//    private BitmapDescriptor bitmapDescriptorFromVector(Context context) {
-//        Drawable vectorDrawable = ContextCompat.getDrawable(context, R.drawable.ic_pin);
-//        Objects.requireNonNull(vectorDrawable).setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
-//        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-//        Canvas canvas = new Canvas(bitmap);
-//        vectorDrawable.draw(canvas);
-//        return BitmapDescriptorFactory.fromBitmap(bitmap);
-//    }
 
     @Override
     public void onInfoWindowClick(Marker marker) {

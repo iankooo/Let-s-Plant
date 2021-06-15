@@ -1,9 +1,5 @@
 package com.e.letsplant.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,6 +16,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.e.letsplant.R;
 import com.e.letsplant.data.User;
 import com.e.letsplant.data.UserViewModel;
@@ -29,13 +29,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 
 import java.util.Objects;
 
@@ -178,7 +176,7 @@ public class SignActivity extends MainActivity {
     private void signUp(String email, String password, String username) {
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                String userUid = firebaseAuth.getCurrentUser().getUid();
+                String userUid = Objects.requireNonNull(firebaseAuth.getCurrentUser()).getUid();
                 User user = new User(userUid, email, "", 0, 0, "",
                         "https://firebasestorage.googleapis.com/v0/b/let-s-plant-f845c.appspot.com/o/placeholder_profileImage.png?alt=media&token=ad5ae128-f579-40e8-ad90-0fccaeda16c7",
                         username);
