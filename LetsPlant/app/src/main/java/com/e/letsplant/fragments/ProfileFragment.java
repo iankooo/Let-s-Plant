@@ -10,14 +10,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -33,6 +25,13 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.e.letsplant.R;
@@ -339,13 +338,6 @@ public class ProfileFragment extends MainFragment {
         location.setSelected(value);
 
         if (!value) {
-//            if (!currentUserInfo.getProfileImage().equals("null") && !currentUserInfo.getProfileImage().equals("")) {
-//                Glide.with(getContext())
-//                        .load(currentUserInfo.getProfileImage())
-//                        .into(image_profile);
-//            } else {
-//                image_profile.setImageResource(R.drawable.ic_user_rounded);
-//            }
             email.setBackgroundResource(android.R.color.transparent);
             username.setBackgroundResource(android.R.color.transparent);
             phone.setBackgroundResource(android.R.color.transparent);

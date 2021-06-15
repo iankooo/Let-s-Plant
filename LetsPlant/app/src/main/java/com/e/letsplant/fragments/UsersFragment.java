@@ -1,14 +1,6 @@
 package com.e.letsplant.fragments;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.MenuItemCompat;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,12 +11,16 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 
-import com.e.letsplant.App;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.MenuItemCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.e.letsplant.R;
 import com.e.letsplant.adapters.UserAdapter;
 import com.e.letsplant.data.User;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -44,19 +40,6 @@ public class UsersFragment extends MainFragment {
     private UserAdapter userAdapter;
 
     private String userUid;
-    private String userId;
-
-    FirebaseAuth auth = App.getFirebaseAuthReference();
-    FirebaseAuth.AuthStateListener authListener = new FirebaseAuth.AuthStateListener() {
-        @Override
-        public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-            FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-            if (firebaseUser != null) {
-                userId = firebaseUser.getUid();
-                String userEmail = firebaseUser.getEmail();
-            }
-        }
-    };
 
     public UsersFragment() {
     }

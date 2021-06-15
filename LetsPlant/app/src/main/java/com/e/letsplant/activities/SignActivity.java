@@ -64,7 +64,6 @@ public class SignActivity extends MainActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
 
-
         initialize();
         checkWhatToShowOnLayout();
     }
